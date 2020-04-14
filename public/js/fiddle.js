@@ -173,10 +173,14 @@ function mindWebcamPlacement() {
 	if(webcamPane[0].clientHeight !== webcamPane[0].scrollHeight){
 		$(".streamCanvas").addClass("overflow");
 		let topPane = $(".top.pane");
-		let maxHeight = topPane.resizable("option", "maxHeight");
-		while (webcamPane[0].clientHeight !== webcamPane[0].scrollHeight && topPane.outerHeight() < maxHeight){
-			topPane.css({height: topPane.outerHeight()+1});
-			bindWebcamPane();
+		try {
+			let maxHeight = topPane.resizable("option", "maxHeight");
+			while (webcamPane[0].clientHeight !== webcamPane[0].scrollHeight && topPane.outerHeight() < maxHeight){
+				topPane.css({height: topPane.outerHeight()+1});
+				bindWebcamPane();
+			}
+		} catch {
+
 		}
 	} else {
 		$(".streamCanvas").removeClass("overflow");
