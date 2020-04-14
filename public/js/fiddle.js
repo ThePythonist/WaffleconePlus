@@ -3,7 +3,7 @@ const Peer = require("simple-peer");
 const clients = [];
 const webcamFPS = 24;
 const webcamRatio = 4/3;
-const movieBounds = [0.5, 0.9];
+const movieBounds = [0.5, 0.9, 0.5, 0.8];
 let room;
 
 
@@ -53,14 +53,37 @@ socket.on("connect", () => {
 });
 
 function bindMoviePane() {
-	let minMovieHeight = $(".wrapper").outerHeight() * movieBounds[0];
-	let maxMovieHeight = $(".wrapper").outerHeight() * movieBounds[1];
-	if ($(".top.pane").outerHeight() < minMovieHeight) {
-		$(".top.pane").css({height: minMovieHeight});
+	let topPane = $(".top.pane");
+	let centerPane = $(".center.pane");
+	let wrapper = $(".wrapper");
+
+	let minMovieHeight = wrapper.outerHeight() * movieBounds[0];
+	let maxMovieHeight = wrapper.outerHeight() * movieBounds[1];
+	let minMovieWidth = wrapper.outerWidth() * movieBounds[2];
+	let maxMovieWidth = wrapper.outerWidth() * movieBounds[3];
+
+	if (topPane.outerHeight() < minMovieHeight) {
+		topPane.css({height: minMovieHeight});
 	}
-	if ($(".top.pane").outerHeight() > maxMovieHeight) {
-		$(".top.pane").css({height: maxMovieHeight});
+	if (topPane.outerHeight() > maxMovieHeight) {
+		topPane.css({height: maxMovieHeight});
 	}
+	if (centerPane.outerWidth() < minMovieWidth) {
+		centerPane.css({width: minMovieWidth});
+	}
+	if (centerPane.outerWidth() > maxMovieWidth) {
+		centerPane.css({width: maxMovieWidth});
+	}
+
+	try {
+		topPane.resizable("option", "minHeight", minMovieHeight);
+		topPane.resizable("option", "maxHeight", maxMovieHeight);
+		centerPane.resizable("option", "minWidth", minMovieWidth);
+		centerPane.resizable("option", "maxWidth", maxMovieWidth);
+	} catch {
+
+	}
+
 	bindWebcamPane();
 }
 
@@ -73,11 +96,10 @@ function setupHandles() {
 	$("body, html, .wrapper").on("resize", bindMoviePane);
 	$(window).on("resize", bindMoviePane);
 
-	$(".left.pane").resizable({
-		handles: "e"
-	});
 	$(".center.pane").resizable({
-	    handles: "e"
+	    handles: "e",
+	    minWidth: $(".wrapper").outerWidth()*movieBounds[2],
+	    maxWidth: $(".wrapper").outerWidth()*movieBounds[3]
 	});
 	$(".top.pane").resizable({
 		handles: "s",
