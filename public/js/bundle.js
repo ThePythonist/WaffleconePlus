@@ -8165,12 +8165,15 @@ function config (name) {
 },{}],34:[function(require,module,exports){
 const socket = io();
 const Peer = require("simple-peer");
-const clients = [];
+const clients = {};
 const webcamFPS = 24;
+const movieFPS = 24;
 const webcamRatio = 4/3;
 const movieBounds = [0.5, 0.9, 0.5, 0.8];
 const resizeReach = 20;
 let room;
+let hosting = null;
+let movieStream = null;
 
 
 socket.on("connect", () => {
@@ -8183,9 +8186,11 @@ socket.on("connect", () => {
 		$("#movieSelector")[0].addEventListener("change", function(e) {
 			let file = this.files[0];
 			let movie = $("#movie")[0];
-			console.log(movie.canPlayType(file.type));
 			if (movie.canPlayType(file.type) !== "") {
 				movie.src = URL.createObjectURL(file);
+				populateMovieCanvas();
+				movie.play();
+				streamMovie();
 			} else {
 				alert("I can't event play that video. Please get better.");
 			}
@@ -8205,7 +8210,10 @@ socket.on("connect", () => {
 			let combined = new MediaStream(tracks);
 
 			socket.on("peerIDs", (peerIDs) => {
-				clients.length = 0;
+				for (let peerID in clients) {
+					removePeer(peerID);
+					delete clients[peerID];
+				}
 				for (let i=0; i<peerIDs.length; i++) {
 					constructPeer(peerIDs[i], true, combined);
 				}
@@ -8214,20 +8222,31 @@ socket.on("connect", () => {
 			socket.on("peerSignal", (peerID, data) => {
 				if (!(peerID in clients)) {
 					constructPeer(peerID, false, combined);
+					if (movieStream !== null) {
+						clients[peerID].addStream(movieStream);
+					}
 				}
 				clients[peerID].signal(data);
 			});
 
 			socket.on("peerDisconnected", (peerID) => {
 				if (peerID in clients) {
-					$(`#video-${peerID}`).remove();
-					$(`#canvas-${peerID}`).remove();
+					removePeer(peerID);
 				}
 			});
 
 		});
 	}
 });
+
+function removePeer(peerID) {
+	$(`#video-${peerID}`).remove();
+	$(`#canvas-${peerID}`).remove();
+	if (peerID === hosting) {
+		clearMovieSpace();
+	}
+	peerClosed(peerID);
+}
 
 
 function bindMoviePane() {
@@ -8265,6 +8284,11 @@ function bindMoviePane() {
 	equalizeLeftRightPanes();
 	bindWebcamPane();
 	mindWebcamPlacement();
+
+
+	let canvas = $("#movieCanvas")[0];
+	canvas.width = centerPane.innerWidth();
+	canvas.height = topPane.innerHeight();
 }
 
 function equalizeLeftRightPanes() {
@@ -8276,7 +8300,7 @@ function equalizeLeftRightPanes() {
 }
 
 function bindWebcamPane() {
-	$(".bottom.pane").css({height: $(".wrapper").outerHeight() - $(".top.pane").outerHeight()});
+	$(".bottom.pane").css({height: $(".wrapper").innerHeight() - $(".top.pane").innerHeight()});
 }
 
 function mindWebcamPlacement() {
@@ -8350,6 +8374,57 @@ function playVideoOnCanvas(video, canvas) {
 	});
 }
 
+function populateMovieCanvas() {
+	let video = $("#movie")[0];
+	let canvas = $("#movieCanvas")[0];
+	let ctx = canvas.getContext("2d");
+	let movieRatio = video.clientWidth / video.clientHeight;
+	canvas.width = $(".center.pane").innerWidth();
+	canvas.height = $(".top.pane").innerHeight();
+	video.addEventListener("play", function() {
+		let $this = this;
+		(function loop() {
+			if (!$this.paused && !$this.ended) {
+				let dw = canvas.width;
+				let dh = canvas.height;
+				if (dw/dh < movieRatio) {
+					dh = dw/movieRatio;
+				} else {
+					dw = dh * movieRatio;
+				}
+				let x = (canvas.width - dw)/2;
+				let y = (canvas.height - dh)/2;
+				ctx.drawImage($this, x, y, dw, dh);
+				setTimeout(loop, 1000/movieFPS);
+			}
+		})();
+	});
+}
+
+function clearMovieSpace() {
+	$("#movie")[0].srcObject = null;
+	let canvas = $("#movieCanvas")[0];
+	canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function streamMovie() {
+	hosting = null;
+	let video = $("#movie")[0];
+	let canvas = $("#movieCanvas")[0];
+	let canvasStream = canvas.captureStream(movieFPS);
+	let tracks = canvasStream.getVideoTracks().concat(video.captureStream().getAudioTracks());
+	if (movieStream !== null) {
+		for (let peerID in clients) {
+			clients[peerID].removeStream(movieStream);
+		}
+	}
+	movieStream = new MediaStream(tracks);
+	for (let peerID in clients) {
+		clients[peerID].addStream(movieStream);
+	}
+}
+
+
 function constructPeer(peerID, initiator, stream) {
 	let peer = new Peer({initiator: initiator,
 						 stream: stream,
@@ -8375,18 +8450,32 @@ function peerClosed (peerID) {
 }
 
 function gotStream(peerID, stream) {
-	let newStream = $(`<video id='video-${peerID}' class='stream'></video>`);
-	newStream[0].srcObject = stream;
-	newStream[0].play();
+	if ($(`#video-${peerID}`).length === 0) {
+		let newStream = $(`<video id='video-${peerID}' class='stream'></video>`);
+		newStream[0].srcObject = stream;
+		newStream[0].play();
 
-	let parent = $(".bottom.pane");
-	parent.append(newStream);
+		let parent = $(".bottom.pane");
+		parent.append(newStream);
 
-	let newCanvas = $(`<canvas id='canvas-${peerID}' class='streamCanvas'></canvas>'`);
+		let newCanvas = $(`<canvas id='canvas-${peerID}' class='streamCanvas'></canvas>'`);
 
-	parent.append(newCanvas);
+		parent.append(newCanvas);
 
-	playVideoOnCanvas(newStream[0], newCanvas[0]);
+		playVideoOnCanvas(newStream[0], newCanvas[0]);
+	} else {
+		hosting = peerID;
+		if (movieStream !== null) {
+			for (let peer in clients) {
+				clients[peer].removeStream(movieStream);
+			}
+			movieStream = null;
+		}
+		let movie = $("#movie")[0];
+		movie.srcObject = stream;
+		populateMovieCanvas();
+		movie.play();
+	}
 
 }
 },{"simple-peer":27}]},{},[34]);
