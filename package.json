@@ -1,0 +1,28 @@
+{
+  "name": "wafflecone",
+  "version": "1.0.0",
+  "description": "share your movies",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "watchify public/js/fiddle.js -o public/js/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThePythonist/WaffleconePlus.git"
+  },
+  "author": "Morgan Saville",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ThePythonist/WaffleconePlus/issues"
+  },
+  "homepage": "https://github.com/ThePythonist/WaffleconePlus#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "simple-peer": "^9.6.2",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "watchify": "^3.11.1"
+  }
+}
