@@ -8419,7 +8419,6 @@ function streamMovie() {
 		}
 	}
 	movieStream = video.captureStream()
-	console.log(movieStream).getAudioTracks();
 	for (let peerID in clients) {
 		clients[peerID].addStream(movieStream);
 	}
