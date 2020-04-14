@@ -8,9 +8,11 @@
 		<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 		<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+		<link rel="icon" href="/img/yinyang.png">
 	</head>
 	<body>
 		<script src="/socket.io/socket.io.js"></script>
+		<script src="./js/simplexNoise.js"></script>
 		<script src="./js/tools.js"></script>
 		<script src="./js/bundle.js"></script>
 
@@ -22,7 +24,11 @@
 				<div class="top pane">
 					<div class="inner">
 						<div class="left pane">
-							Left
+							<div id="emojiDiv">
+							</div>
+							<div id="spamDiv">
+								<input type="text" class="form-control" placeholder="message"></input>
+							</div>
 						</div>
 						<div class="center pane">
 							<video id="movie" class="movie"></video>

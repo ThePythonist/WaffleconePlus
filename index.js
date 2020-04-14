@@ -35,7 +35,21 @@ io.on("connection", (socket) => {
 	socket.on("requestPause", function(hosting, paused) {
 		io.to(hosting).emit("requestPause", paused);
 		console.log(`client ${this.id} requested that client ${hosting} pause the movie`);
-	})
+	});
+
+	socket.on("requestScrub", function(hosting, p) {
+		io.to(hosting).emit("requestScrub", p);
+		console.log(`client ${this.id} requested that client ${hosting} scrub to p=${p}`);
+	});
+
+	socket.on("spam", function(data) {
+		io.sockets.in(this.room).emit("spam", data);
+	});
+
+	socket.on("spam-emoji", function(data) {
+		io.sockets.in(this.room).emit("spam-emoji", data);
+	});
+
 });
 
 function disconnect() {

@@ -8167,7 +8167,7 @@ const socket = io();
 const Peer = require("simple-peer");
 const clients = {};
 const webcamFPS = 24;
-const movieFPS = 48;
+const movieFPS = 60;
 const webcamRatio = 4/3;
 const movieBounds = [0.5, 0.9, 0.5, 0.8];
 const resizeReach = 20;
@@ -8177,6 +8177,12 @@ let room;
 let hosting = null;
 let movieStream = null;
 
+const barHeight = 10;
+const barPadding = 10;
+const handleRadius = 10;
+const scrubTimeFontSize = 25;
+
+const emoji = ["grin", "face with hearts", "heart", "kiss", "hug", "wink", "heart eyes", "crazy"];
 
 socket.on("connect", () => {
 	let vars = getParams(window.location.href);
@@ -8194,6 +8200,7 @@ socket.on("connect", () => {
 				let canvas = $("#movieCanvas")[0];
 				movieData.paused = true;
 				movieData.time = 0;
+				movieData.duration = 0;
 				movie.addEventListener("canplay", streamMovie);
 				movie.addEventListener("loadeddata", () => {
 					drawMovieFrame(null, canvas, canvas.getContext("2d"), movie.clientWidth / movie.clientHeight);
@@ -8215,6 +8222,23 @@ socket.on("connect", () => {
 			let canvasStream = myCanvas.captureStream(webcamFPS);
 			let tracks = canvasStream.getVideoTracks().concat(stream.getAudioTracks());
 			let combined = new MediaStream(tracks);
+
+			for (let e of emoji) {
+				let button = $("<button type='button'></button>");
+				let img = $(`<img class='emoji' src='/img/emoji/${e}.png'></img>`);
+				button.append(img);
+				button[0].addEventListener("click", function() {
+					this.blur();
+					socket.emit("spam-emoji", e);
+				});
+				$("#emojiDiv").append(button);
+			}
+
+			$("#spamDiv input")[0].addEventListener("keyup", function(event) {
+				if (event.keyCode === 13) {
+					spam();
+				}
+			});
 
 			socket.on("peerIDs", (peerIDs) => {
 				for (let peerID in clients) {
@@ -8245,11 +8269,11 @@ socket.on("connect", () => {
 			socket.on("movieData", (data) => {
 				movieData.paused = data.paused;
 				movieData.time = data.time;
+				movieData.duration = data.duration;
 			});
 
 			socket.on("requestPause", (paused) => {
 				if (hosting === null && movieStream !== null) {
-					console.log("pausing");
 					if (paused) {
 						$("#movie")[0].pause();
 					} else {
@@ -8258,9 +8282,70 @@ socket.on("connect", () => {
 				}
 			});
 
+			socket.on("requestScrub", (p) => {
+				if (hosting === null && movieStream !== null) {
+					let movie = $("#movie")[0];
+					movie.currentTime = p * movie.duration;
+					let canvas = $("#movieCanvas")[0];
+					drawMovieFrame(movie, canvas, canvas.getContext("2d"), video.clientWidth/video.clientHeight);
+					sendMovieData();
+				}
+			});
+
+			socket.on("spam", showSpam);
+			socket.on("spam-emoji", showSpamEmoji);
+
 		});
 	}
 });
+
+function showSpam(message) {
+	let spamDiv = document.createElement("div");
+	spamDiv.classList.add("spam");
+	spamDiv.innerText = message;
+	document.body.appendChild(spamDiv);
+	spamDiv.style.top = "100%";
+	spamDiv.style.left = ""+(document.body.clientWidth-spamDiv.clientWidth)/2+"px";
+	floatSpam(spamDiv);
+}
+
+function showSpamEmoji(name) {
+	let spamDiv = document.createElement("div");
+	spamDiv.classList.add("spam");
+	let spamImg = document.createElement("img");
+	spamImg.src = `/img/emoji/${name}.png`;
+	spamDiv.appendChild(spamImg);
+	document.body.appendChild(spamDiv);
+	spamDiv.style.top = "100%";
+	spamDiv.style.left = ""+(document.body.clientWidth-spamDiv.clientWidth)/2+"px";
+	floatSpam(spamDiv);
+}
+
+function floatSpam(element, simplexNoise) {
+	let seed = Date.now();
+	let roughness = 0.005;
+	let amplitude = 5;
+	let speed = 7;
+	if (!simplexNoise) {
+		simplexNoise = openSimplexNoise(seed);
+	}
+	let top = parseInt(element.style.marginTop);
+	if (element.style.marginTop === "") {
+		top = 0;
+	}
+	element.style.marginTop = "" + (top - speed) + "px";
+
+	let left = parseInt(element.style.marginLeft);
+	if (element.style.marginLeft === "") {
+		left = 0;
+	}
+	element.style.marginLeft = "" + (left + simplexNoise.noise2D(0, seed*roughness)*amplitude) + "px";
+	if (top > -element.clientHeight-document.body.clientHeight) {
+		setTimeout(() => {floatSpam(element, simplexNoise)}, 1000/60);
+	} else {
+		element.remove();
+	}
+}
 
 function loadImages() {
 	icons["play"] = new Image();
@@ -8392,7 +8477,7 @@ function setupHandles() {
 		let menu = $("#menuCanvas")[0]
 		let movieBox = menu.getBoundingClientRect();
 		if (movieBox.left <= e.clientX && e.clientX <= movieBox.right && movieBox.top <= e.clientY && e.clientY <= movieBox.bottom) {
-			menuOverlay();
+			menuOverlay(e);
 		} else {
 			menu.getContext("2d").clearRect(0, 0, menu.width, menu.height);
 		}
@@ -8416,7 +8501,7 @@ function playVideoOnCanvas(video, canvas) {
 	});
 }
 
-function menuOverlay(event) {
+function menuOverlay(e) {
 	if (hosting !== null || movieStream !== null) {
 		let canvas = $("#menuCanvas")[0]
 		let movieCanvas = $("#movieCanvas")[0];
@@ -8426,19 +8511,124 @@ function menuOverlay(event) {
 		let icon = movieData.paused? icons["play"]: icons["pause"];
 		let iconSize = 50;
 		ctx.drawImage(icon, (canvas.width-iconSize)/2, (canvas.height-iconSize)/2, iconSize, iconSize);
+		let video = $("#movie")[0];
+
+		let movieRatio = video.clientWidth/video.clientHeight;
+		let dw = canvas.width;
+		let dh = canvas.height;
+		if (dw/dh < movieRatio) {
+			dh = dw/movieRatio;
+		} else {
+			dw = dh * movieRatio;
+		}
+
+		let w = dw - (2 * barPadding);
+		let x = (canvas.width - w)/2;
+		let y = Math.min((canvas.height + dh)/2, canvas.height - barHeight);
+		ctx.fillStyle = "#FFFFFF";
+		ctx.strokeStyle = "#000000";
+		ctx.lineWidth = 5;
+		ctx.beginPath();
+		ctx.rect(x, y, w, barHeight);
+		ctx.fill();
+		ctx.stroke();
+
+		let p = movieData.time / movieData.duration;
+		ctx.fillStyle = "#34EB8F";
+		let filledW = p * w;
+		ctx.beginPath();
+		ctx.rect(x, y, filledW, barHeight);
+		ctx.fill();
+		ctx.stroke();
+
+		ctx.font = `${scrubTimeFontSize}px Helvetica`;
+
+		let s = scrubPos(e);
+		ctx.textAlign = "center";
+		let hoverTextWidth = 0;
+		if (s !== null) {
+			ctx.lineWidth = 1;
+			ctx.fillStyle = "#FFFFFF";
+			let hoverText = new Date(s * movieData.duration * 1000).toISOString().substr(11, 8);
+			hoverTextWidth = ctx.measureText(hoverText).width;
+			ctx.fillText(hoverText, e.offsetX, y+barHeight+scrubTimeFontSize);
+			ctx.strokeText(hoverText, e.offsetX, y+barHeight+scrubTimeFontSize);
+			ctx.fillStyle = "#34EB8F";
+			ctx.lineWidth = 5;
+			ctx.beginPath();
+			ctx.arc(e.offsetX, y+barHeight/2, handleRadius, 0, 2*Math.PI);
+			ctx.fill();
+			ctx.stroke();
+		}
+
+		ctx.lineWidth = 1;
+		ctx.fillStyle = "#FFFFFF";
+		let t = new Date(movieData.time * 1000).toISOString().substr(11, 8);
+		let textWidth = ctx.measureText(t).width;
+		let tx = Math.min(Math.max(x+filledW, textWidth/2), canvas.width-textWidth/2);
+		if (s === null || e.offsetX - hoverTextWidth/2 > tx+textWidth/2 || e.offsetX + hoverTextWidth/2 < tx-textWidth/2) {
+			ctx.fillText(t, tx, y+barHeight+scrubTimeFontSize);
+			ctx.strokeText(t, tx, y+barHeight+scrubTimeFontSize);
+		}
+
+		ctx.textAlign = "right";
+		t = new Date(movieData.duration * 1000).toISOString().substr(11, 8);
+		let endTextWidth = ctx.measureText(t).width;
+		if (x+filledW+textWidth/2 < x+w-endTextWidth) {
+			if (s === null || e.offsetX + hoverTextWidth/2 < x+w-endTextWidth) {
+				ctx.fillText(t, x+w, y+barHeight+scrubTimeFontSize);
+				ctx.strokeText(t, x+w, y+barHeight+scrubTimeFontSize);
+			}
+		}	
+
+
+	}
+}
+
+function scrubPos(e) {
+	let video = $("#movie")[0];
+	let canvas = $("#menuCanvas")[0];
+
+	let movieRatio = video.clientWidth/video.clientHeight;
+	let dw = canvas.width;
+	let dh = canvas.height;
+	if (dw/dh < movieRatio) {
+		dh = dw/movieRatio;
+	} else {
+		dw = dh * movieRatio;
+	}
+
+	let w = dw - (2 * barPadding);
+	let x = (canvas.width - w)/2;
+	let y = Math.min((canvas.height + dh)/2, canvas.height - barHeight);
+
+	if (x <= e.offsetX && e.offsetX <= x + w && y <= e.offsetY && e.offsetY <= y + barHeight) {
+		return (e.offsetX - x)/w;
+	} else {
+		return null;
 	}
 }
 
 function menuClick(event) {
-	socket.emit("requestPause", hosting, !movieData.paused);
+	let p = scrubPos(event);
+	if (p === null) {
+		socket.emit("requestPause", hosting, !movieData.paused);
+	} else {
+		socket.emit("requestScrub", hosting, p);
+	}
 }
 
 function myMenuClick(event) {
-	let movie = $("#movie");
-	if (movie[0].paused) {
-		movie[0].play();
+	let movie = $("#movie")[0];
+	let p = scrubPos(event);
+	if (p === null) {
+		if (movie.paused) {
+			movie.play();
+		} else {
+			movie.pause();
+		}
 	} else {
-		movie[0].pause();
+		movie.currentTime = movie.duration * p;
 	}
 }
 
@@ -8446,6 +8636,7 @@ function sendMovieData() {
 	let movie = $("#movie")[0];
 	movieData.paused = movie.paused;
 	movieData.time = movie.currentTime;
+	movieData.duration = movie.duration;
 	socket.emit("movieData", movieData);
 }
 
@@ -8555,6 +8746,14 @@ function peerClosed (peerID) {
 	}
 }
 
+function spam() {
+	let input = $("#spamDiv input")[0];
+	let message = input.value;
+	input.value = "";
+	socket.emit("spam", message);
+}
+
+
 function gotStream(peerID, stream) {
 	if ($(`#video-${peerID}`).length === 0) {
 		let newStream = $(`<video id='video-${peerID}' class='stream'></video>`);
@@ -8573,6 +8772,7 @@ function gotStream(peerID, stream) {
 		hosting = peerID;
 		movieData.paused = true;
 		movieData.time = 0;
+		movieData.duration = 0;
 		if (movieStream !== null) {
 			$("#menuCanvas")[0].removeEventListener("click", myMenuClick);
 			removeUpdateEventListeners();

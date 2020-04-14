@@ -3,6 +3,11 @@ html, body {
 	margin: 0px;
     height: 100%;
     overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-image: linear-gradient(to bottom right, #6e8ab1, #84648d);
 }
 
 .stream, .movie {
@@ -19,7 +24,6 @@ html, body {
     left: 0;
     right: 0;
     height: 20px;
-    background-color: moccasin;  
 }
 .wrapper {
     position:absolute;
@@ -27,7 +31,6 @@ html, body {
     right: 0;
     bottom: 0;
     left: 0;
-    background-color: fuchsia;
 }
 
 .inner-wrapper,
@@ -40,27 +43,22 @@ html, body {
     display: table-cell;
 }
 .left.pane {
-   background-color: olivedrab; 
    vertical-align: top;
 }
-.center.pane {
-    background-color: lightblue;
-}
+
+
 .top.pane,
 .bottom.pane{
     display: block;  
 }
-.center.pane .inner .top {
-    background-color: lightcoral;   
-}
+
 .bottom {   
-    background-color: orange;
     width: 100%;
     text-align: center;
 }
 .right.pane {
-    background-color: #999;
     vertical-align: top;
+    text-align: center;
 }
 
 .top.pane .inner .pane{
@@ -73,12 +71,15 @@ html, body {
 
 .center.pane {
     overflow: visible;
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .streamCanvas {
 	height: 90%;
     display: inline-block;
     transform: translateY(5.555556%);
+    border: 3px solid black;
+    border-radius: 10px;
 }
 
 .streamCanvas.overflow {
@@ -86,7 +87,8 @@ html, body {
 }
 
 .ui-resizable-handle.show {
-    background-color: black;
+    background-color: white;
+    border: 1px solid black;
 }
 
 input[type="file"] {
@@ -95,6 +97,7 @@ input[type="file"] {
 
 label {
     cursor: pointer;
+    display: inline-block;
 }
 
 .movieContainer {
@@ -107,9 +110,58 @@ label {
     width: 100%;
     height: 100%;
     position: absolute;
-
 }
 
 #menuCanvas {
     z-index: 1;
 }
+
+.emoji {
+    width: 50px;
+}
+
+button, label {
+    display: inline-block;
+    margin: 10px;
+    padding: 5px 10px 5px 10px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #a800d6;
+    font-size: 25px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover, label:hover {
+    background-color: #7e00a1;
+}
+
+button:active, label:active {
+    background-color: #520069;
+}
+
+#emojiDiv, #spamDiv{
+    text-align: center;
+    margin-top: 50px;
+}
+
+#spamDiv input {
+    text-align: center;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.spam, .hand {
+    position: fixed;
+    display: inline-block;
+    z-index:100;
+}
+
+.spam {
+    background-color: #ccffe6;
+    border: 2px solid black;
+    border-radius: 20px;
+    padding: 20px;
+    font-size: 30px;
+    font-weight: bold;
