@@ -245,15 +245,16 @@ function clearMovieSpace() {
 function streamMovie() {
 	hosting = null;
 	let video = $("#movie")[0];
-	let canvas = $("#movieCanvas")[0];
-	let canvasStream = canvas.captureStream(movieFPS);
-	let tracks = canvasStream.getVideoTracks().concat(video.captureStream().getAudioTracks());
+	//let canvas = $("#movieCanvas")[0];
+	//let canvasStream = canvas.captureStream(movieFPS);
+	//let tracks = canvasStream.getVideoTracks().concat(video.captureStream().getAudioTracks());
 	if (movieStream !== null) {
 		for (let peerID in clients) {
 			clients[peerID].removeStream(movieStream);
 		}
 	}
-	movieStream = new MediaStream(tracks);
+	movieStream = video.captureStream()
+	console.log(movieStream).getAudioTracks();
 	for (let peerID in clients) {
 		clients[peerID].addStream(movieStream);
 	}
