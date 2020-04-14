@@ -9,6 +9,23 @@ app.use(express.static(__dirname + "/public"));
 io.on("connection", (socket) => {
 	console.log(`client ${socket.id} connected`);
 	socket.on("disconnect", disconnect);
+
+	socket.on("newConnection", function (room) {
+		console.log(`client ${this.id} joined room ${room}`);
+		this.join(room);
+		let peerIDs = [];
+		for (let s in io.sockets.adapter.rooms[room].sockets) {
+			if (s !== this.id) {
+				peerIDs.push(s);
+			}
+		}
+		this.emit("peerIDs", peerIDs);
+	});
+
+	socket.on("signal", function (socketID, data) {
+		console.log(`client ${this.id} is sending a signal to client ${socketID}`);
+		io.to(socketID).emit("peerSignal", this.id, data);
+	});
 });
 
 function disconnect() {
