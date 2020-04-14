@@ -4,6 +4,7 @@ const clients = [];
 const webcamFPS = 24;
 const webcamRatio = 4/3;
 const movieBounds = [0.5, 0.9, 0.5, 0.8];
+const resizeReach = 20;
 let room;
 
 
@@ -14,6 +15,17 @@ socket.on("connect", () => {
 		document.body.innerText = "Invalid room. Please apologise.";
 	} else {
 		setupHandles();
+		$("#movieSelector")[0].addEventListener("change", function(e) {
+			let file = this.files[0];
+			let movie = $("#movie")[0];
+			console.log(movie.canPlayType(file.type));
+			if (movie.canPlayType(file.type) !== "") {
+				movie.src = URL.createObjectURL(file);
+			} else {
+				alert("I can't event play that video. Please get better.");
+			}
+		});
+
 		navigator.mediaDevices.getUserMedia({video: true, audio:true}).then(stream => {
 			socket.emit("newConnection", room);
 			let myStream = $("#myStream")[0];
@@ -52,6 +64,7 @@ socket.on("connect", () => {
 	}
 });
 
+
 function bindMoviePane() {
 	let topPane = $(".top.pane");
 	let centerPane = $(".center.pane");
@@ -84,11 +97,39 @@ function bindMoviePane() {
 
 	}
 
+	equalizeLeftRightPanes();
 	bindWebcamPane();
+	mindWebcamPlacement();
+}
+
+function equalizeLeftRightPanes() {
+	let leftPane = $(".left.pane");
+	let rightPane = $(".right.pane");
+	let newWidth = (leftPane.outerWidth() + rightPane.outerWidth())/2;
+	leftPane.css({width: newWidth});
+	rightPane.css({width: newWidth});
 }
 
 function bindWebcamPane() {
 	$(".bottom.pane").css({height: $(".wrapper").outerHeight() - $(".top.pane").outerHeight()});
+}
+
+function mindWebcamPlacement() {
+	let webcamPane = $(".bottom.pane");
+	if(webcamPane[0].clientHeight !== webcamPane[0].scrollHeight){
+		$(".streamCanvas").addClass("overflow");
+		let topPane = $(".top.pane");
+		let maxHeight = topPane.resizable("option", "maxHeight");
+		while (webcamPane[0].clientHeight !== webcamPane[0].scrollHeight && topPane.outerHeight() < maxHeight){
+			topPane.css({height: topPane.outerHeight()+1});
+			bindWebcamPane();
+		}
+	} else {
+		$(".streamCanvas").removeClass("overflow");
+		if(webcamPane[0].clientHeight !== webcamPane[0].scrollHeight){
+			$(".streamCanvas").addClass("overflow");
+		}
+	}
 }
 
 function setupHandles() {
@@ -106,6 +147,25 @@ function setupHandles() {
 		minHeight: $(".wrapper").outerHeight()*movieBounds[0],
 		maxHeight: $(".wrapper").outerHeight()*movieBounds[1]
 	}).on("resize", bindWebcamPane);
+
+	$("body")[0].addEventListener("mousemove", function(e) {
+		let handles = $(".ui-resizable-handle").each(function (index) {
+			let pos = this.getBoundingClientRect();
+			if ($(this).hasClass("ui-resizable-e") || $(this).hasClass("ui-resizable-w")) {
+				if (e.clientX >= pos.left - resizeReach && e.clientX <= pos.right + resizeReach) {
+					$(this).addClass("show");
+				} else {
+					$(this).removeClass("show");
+				}
+			} else {
+				if (e.clientY >= pos.top - resizeReach && e.clientY <= pos.bottom + resizeReach) {
+					$(this).addClass("show");
+				} else {
+					$(this).removeClass("show");
+				}
+			}
+		});		
+	});
 }
 
 function playVideoOnCanvas(video, canvas) {

@@ -2,13 +2,15 @@ html, body {
 	padding: 0px;
 	margin: 0px;
     height: 100%;
+    overflow: hidden;
 }
 
-.stream {
+.stream, .movie {
 	position: fixed;
 	top: 0px;
 	left: 0px;
 	opacity: 0;
+    z-index: -100;
 }
 
 .header {
@@ -53,6 +55,7 @@ html, body {
 .bottom {   
     background-color: orange;
     width: 100%;
+    text-align: center;
 }
 .right.pane {
     background-color: #999;
@@ -62,6 +65,28 @@ html, body {
 	height: 100%;
 }
 
+.top.pane {
+    height: 75%;
+}
+
 .streamCanvas {
-	height: 75%;
+	height: 90%;
+    display: inline-block;
+    transform: translateY(5.555556%);
+}
+
+.streamCanvas.overflow {
+    height: 40%;
+}
+
+.ui-resizable-handle.show {
+    background-color: black;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+label {
+    cursor: pointer;
 }
