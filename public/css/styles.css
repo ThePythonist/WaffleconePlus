@@ -1,0 +1,67 @@
+html, body {
+	padding: 0px;
+	margin: 0px;
+    height: 100%;
+}
+
+.stream {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	opacity: 0;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background-color: moccasin;  
+}
+.wrapper {
+    position:absolute;
+    top: 21px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: fuchsia;
+}
+
+.inner-wrapper,
+.top .inner {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+.pane {
+    display: table-cell;
+}
+.left.pane {
+   background-color: olivedrab; 
+}
+.center.pane {
+    background-color: lightblue;
+}
+.top.pane,
+.bottom.pane{
+    display: block;  
+}
+.center.pane .inner .top {
+    background-color: lightcoral;   
+}
+.bottom {   
+    background-color: orange;
+    width: 100%;
+}
+.right.pane {
+    background-color: #999;
+}
+
+.top.pane .inner .pane{
+	height: 100%;
+}
+
+.streamCanvas {
+	height: 75%;
+}

@@ -13,6 +13,7 @@ io.on("connection", (socket) => {
 	socket.on("newConnection", function (room) {
 		console.log(`client ${this.id} joined room ${room}`);
 		this.join(room);
+		this.room = room;
 		let peerIDs = [];
 		for (let s in io.sockets.adapter.rooms[room].sockets) {
 			if (s !== this.id) {
@@ -30,6 +31,7 @@ io.on("connection", (socket) => {
 
 function disconnect() {
 	console.log(`client ${this.id} disconnected`);
+	io.sockets.in(this.room).emit("peerDisconnected", this.id);
 }
 
 http.listen(port, () => console.log(`listening on port ${port}`));
