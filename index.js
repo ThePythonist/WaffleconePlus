@@ -27,6 +27,15 @@ io.on("connection", (socket) => {
 		console.log(`client ${this.id} is sending a signal to client ${socketID}`);
 		io.to(socketID).emit("peerSignal", this.id, data);
 	});
+
+	socket.on("movieData", function(movieData) {
+		socket.broadcast.to(this.room).emit("movieData", movieData);
+	});
+
+	socket.on("requestPause", function(hosting, paused) {
+		io.to(hosting).emit("requestPause", paused);
+		console.log(`client ${this.id} requested that client ${hosting} pause the movie`);
+	})
 });
 
 function disconnect() {

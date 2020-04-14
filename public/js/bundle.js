@@ -8171,6 +8171,8 @@ const movieFPS = 24;
 const webcamRatio = 4/3;
 const movieBounds = [0.5, 0.9, 0.5, 0.8];
 const resizeReach = 20;
+const icons = {};
+const movieData = {};
 let room;
 let hosting = null;
 let movieStream = null;
@@ -8189,8 +8191,13 @@ socket.on("connect", () => {
 			if (movie.canPlayType(file.type) !== "") {
 				movie.src = URL.createObjectURL(file);
 				populateMovieCanvas();
-				movie.play();
-				streamMovie();
+				let canvas = $("#movieCanvas")[0];
+				movieData.paused = true;
+				movieData.time = 0;
+				movie.addEventListener("canplay", streamMovie);
+				movie.addEventListener("loadeddata", () => {
+					drawMovieFrame(null, canvas, canvas.getContext("2d"), movie.clientWidth / movie.clientHeight);
+				});
 			} else {
 				alert("I can't event play that video. Please get better.");
 			}
@@ -8198,13 +8205,13 @@ socket.on("connect", () => {
 
 		navigator.mediaDevices.getUserMedia({video: true, audio:true}).then(stream => {
 			socket.emit("newConnection", room);
+			loadImages();
 			let myStream = $("#myStream")[0];
 			myStream.srcObject = stream;
 			myStream.play();
 			let myCanvas = $("#myCanvas")[0];
 
 			playVideoOnCanvas(myStream, myCanvas);
-
 			let canvasStream = myCanvas.captureStream(webcamFPS);
 			let tracks = canvasStream.getVideoTracks().concat(stream.getAudioTracks());
 			let combined = new MediaStream(tracks);
@@ -8235,9 +8242,32 @@ socket.on("connect", () => {
 				}
 			});
 
+			socket.on("movieData", (data) => {
+				movieData.paused = data.paused;
+				movieData.time = data.time;
+			});
+
+			socket.on("requestPause", (paused) => {
+				if (hosting === null && movieStream !== null) {
+					console.log("pausing");
+					if (paused) {
+						$("#movie")[0].pause();
+					} else {
+						$("#movie")[0].play();
+					}
+				}
+			});
+
 		});
 	}
 });
+
+function loadImages() {
+	icons["play"] = new Image();
+	icons["play"].src = "./img/icons/play.svg";
+	icons["pause"] = new Image();
+	icons["pause"].src = "./img/icons/pause.svg";
+}
 
 function removePeer(peerID) {
 	$(`#video-${peerID}`).remove();
@@ -8341,19 +8371,27 @@ function setupHandles() {
 		let handles = $(".ui-resizable-handle").each(function (index) {
 			let pos = this.getBoundingClientRect();
 			if ($(this).hasClass("ui-resizable-e") || $(this).hasClass("ui-resizable-w")) {
-				if (e.clientX >= pos.left - resizeReach && e.clientX <= pos.right + resizeReach) {
+				if (e.clientX >= pos.left - resizeReach && e.clientX <= pos.right + resizeReach && e.clientY >= pos.top && e.clientY <= pos.bottom) {
 					$(this).addClass("show");
 				} else {
 					$(this).removeClass("show");
 				}
 			} else {
-				if (e.clientY >= pos.top - resizeReach && e.clientY <= pos.bottom + resizeReach) {
+				if (e.clientY >= pos.top - resizeReach && e.clientY <= pos.bottom + resizeReach && e.clientX >= pos.left && e.clientX <= pos.right) {
 					$(this).addClass("show");
 				} else {
 					$(this).removeClass("show");
 				}
 			}
-		});		
+		});
+
+		let menu = $("#menuCanvas")[0]
+		let movieBox = menu.getBoundingClientRect();
+		if (movieBox.left <= e.clientX && e.clientX <= movieBox.right && movieBox.top <= e.clientY && e.clientY <= movieBox.bottom) {
+			menuOverlay();
+		} else {
+			menu.getContext("2d").clearRect(0, 0, menu.width, menu.height);
+		}
 	});
 }
 
@@ -8374,42 +8412,108 @@ function playVideoOnCanvas(video, canvas) {
 	});
 }
 
+function menuOverlay(event) {
+	if (hosting !== null || movieStream !== null) {
+		let canvas = $("#menuCanvas")[0]
+		let movieCanvas = $("#movieCanvas")[0];
+		canvas.width = movieCanvas.width;
+		canvas.height = movieCanvas.height;
+		let ctx = canvas.getContext("2d");
+		let icon = movieData.paused? icons["play"]: icons["pause"];
+		let iconSize = 50;
+		ctx.drawImage(icon, (canvas.width-iconSize)/2, (canvas.height-iconSize)/2, iconSize, iconSize);
+	}
+}
+
+function menuClick(event) {
+	socket.emit("requestPause", hosting, !movieData.paused);
+}
+
+function myMenuClick(event) {
+	let movie = $("#movie");
+	if (movie[0].paused) {
+		movie[0].play();
+	} else {
+		movie[0].pause();
+	}
+}
+
+function sendMovieData() {
+	let movie = $("#movie")[0];
+	movieData.paused = movie.paused;
+	movieData.time = movie.currentTime;
+	socket.emit("movieData", movieData);
+}
+
 function populateMovieCanvas() {
 	let video = $("#movie")[0];
 	let canvas = $("#movieCanvas")[0];
+
+	$("#menuCanvas")[0].addEventListener("click", menuClick);
 	let ctx = canvas.getContext("2d");
 	let movieRatio = video.clientWidth / video.clientHeight;
 	canvas.width = $(".center.pane").innerWidth();
 	canvas.height = $(".top.pane").innerHeight();
 	video.addEventListener("play", function() {
 		let $this = this;
+		canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 		(function loop() {
 			if (!$this.paused && !$this.ended) {
-				let dw = canvas.width;
-				let dh = canvas.height;
-				if (dw/dh < movieRatio) {
-					dh = dw/movieRatio;
-				} else {
-					dw = dh * movieRatio;
-				}
-				let x = (canvas.width - dw)/2;
-				let y = (canvas.height - dh)/2;
-				ctx.drawImage($this, x, y, dw, dh);
+				drawMovieFrame(video, canvas, ctx, movieRatio);
 				setTimeout(loop, 1000/movieFPS);
 			}
 		})();
 	});
 }
 
+function drawMovieFrame(video, canvas, ctx, movieRatio) {
+	let dw = canvas.width;
+	let dh = canvas.height;
+	if (dw/dh < movieRatio) {
+		dh = dw/movieRatio;
+	} else {
+		dw = dh * movieRatio;
+	}
+	let x = (canvas.width - dw)/2;
+	let y = (canvas.height - dh)/2;
+	if (video === null) {
+		ctx.fillStyle = "#000000";
+		ctx.fillRect(x, y, dw, dh);
+	} else {
+		ctx.drawImage(video, x, y, dw, dh);
+	}
+}
+
 function clearMovieSpace() {
 	$("#movie")[0].srcObject = null;
+	$("#menuCanvas")[0].removeEventListener("click", menuClick);
 	let canvas = $("#movieCanvas")[0];
 	canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function removeUpdateEventListeners() {
+	let movie = $("#movie")[0];
+	movie.removeEventListener("play", sendMovieData);
+	movie.removeEventListener("pause", sendMovieData);
+	movie.removeEventListener("playing", sendMovieData);
+	movie.removeEventListener("timeupdate", sendMovieData);
+}
+
+function addUpdateEventListeners() {
+	movie.addEventListener("play", sendMovieData);
+	movie.addEventListener("pause", sendMovieData);
+	movie.addEventListener("playing", sendMovieData);
+	movie.addEventListener("timeupdate", sendMovieData);
 }
 
 function streamMovie() {
 	hosting = null;
 	let video = $("#movie")[0];
+	$("#menuCanvas")[0].removeEventListener("click", myMenuClick);
+	$("#menuCanvas")[0].addEventListener("click", myMenuClick);
+
+	removeUpdateEventListeners();
+	addUpdateEventListeners();
 	if (movieStream !== null) {
 		for (let peerID in clients) {
 			clients[peerID].removeStream(movieStream);
@@ -8419,6 +8523,7 @@ function streamMovie() {
 	for (let peerID in clients) {
 		clients[peerID].addStream(movieStream);
 	}
+
 }
 
 
@@ -8462,7 +8567,11 @@ function gotStream(peerID, stream) {
 		playVideoOnCanvas(newStream[0], newCanvas[0]);
 	} else {
 		hosting = peerID;
+		movieData.paused = true;
+		movieData.time = 0;
 		if (movieStream !== null) {
+			$("#menuCanvas")[0].removeEventListener("click", myMenuClick);
+			removeUpdateEventListeners();
 			for (let peer in clients) {
 				clients[peer].removeStream(movieStream);
 			}

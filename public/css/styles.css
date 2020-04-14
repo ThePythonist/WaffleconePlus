@@ -97,7 +97,19 @@ label {
     cursor: pointer;
 }
 
-#movieCanvas {
+.movieContainer {
+    position: relative;
     width: 100%;
     height: 100%;
+}
+
+#movieCanvas, #menuCanvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+
+}
+
+#menuCanvas {
+    z-index: 1;
 }
