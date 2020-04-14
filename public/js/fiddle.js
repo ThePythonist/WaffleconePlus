@@ -54,19 +54,23 @@ socket.on("connect", () => {
 
 function bindMoviePane() {
 	let minMovieHeight = $(".wrapper").outerHeight() * movieBounds[0];
-	let maxMovieHeight = $(".wrapper").outerHeight() * movieBounds[0];
+	let maxMovieHeight = $(".wrapper").outerHeight() * movieBounds[1];
 	if ($(".top.pane").outerHeight() < minMovieHeight) {
 		$(".top.pane").css({height: minMovieHeight});
 	}
 	if ($(".top.pane").outerHeight() > maxMovieHeight) {
 		$(".top.pane").css({height: maxMovieHeight});
 	}
+	bindWebcamPane();
+}
+
+function bindWebcamPane() {
 	$(".bottom.pane").css({height: $(".wrapper").outerHeight() - $(".top.pane").outerHeight()});
 }
 
 function setupHandles() {
 	bindMoviePane();
-	$("body, html, .wrapper, .top.pane").on("resize", bindMoviePane);
+	$("body, html, .wrapper").on("resize", bindMoviePane);
 	$(window).on("resize", bindMoviePane);
 
 	$(".left.pane").resizable({
@@ -79,7 +83,7 @@ function setupHandles() {
 		handles: "s",
 		minHeight: $(".wrapper").outerHeight()*movieBounds[0],
 		maxHeight: $(".wrapper").outerHeight()*movieBounds[1]
-	});
+	}).on("resize", bindWebcamPane);
 }
 
 function playVideoOnCanvas(video, canvas) {
