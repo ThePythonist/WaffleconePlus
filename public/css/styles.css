@@ -56,7 +56,7 @@ body {
 	width: 100%;
 	text-align: center;
 }
-.right.pane {
+.right.pane, .left.pane {
 	vertical-align: top;
 	text-align: center;
 }
@@ -143,7 +143,12 @@ button:active, label:active {
 
 #emojiDiv, #spamDiv{
 	text-align: center;
-	margin-top: 50px;
+	margin-top: 20px;
+}
+
+#emojiDiv {
+    max-height: 450px;
+    overflow-y: auto;
 }
 
 #spamDiv input {
@@ -206,4 +211,10 @@ button:active, label:active {
 
 .menuButton img {
     height: 100%;
+}
+
+.logo {
+    width: 20%;
+    display: inline-block;
+    margin-top: 10px;
 }

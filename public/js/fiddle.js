@@ -17,7 +17,7 @@ const barPadding = 10;
 const handleRadius = 10;
 const scrubTimeFontSize = 25;
 
-const emoji = ["grin", "face with hearts", "heart", "kiss", "hug", "wink", "heart eyes", "crazy", "transflag", "frog"];
+const emoji = ["grin", "laugh", "face with hearts", "heart", "tongue", "kiss", "hug", "wink", "heart eyes", "crazy", "cry", "thumbs up", "gay", "transflag", "frog"];
 
 socket.on("connect", () => {
 	let vars = getParams(window.location.href);
