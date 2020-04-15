@@ -8456,8 +8456,10 @@ function bindMoviePane() {
 	if (hosting !== null || movieStream !== null) {
 		let video = $("#movie")[0];
 
-		drawMovieFrame(null, canvas, canvas.getContext("2d"), video.clientWidth / video.clientHeight);
-		drawMovieFrame(video, canvas, canvas.getContext("2d"), video.clientWidth / video.clientHeight);
+		let ctx = canvas.getContext("2d")
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		drawMovieFrame(null, canvas, ctx, video.clientWidth / video.clientHeight);
+		drawMovieFrame(video, canvas, ctx, video.clientWidth / video.clientHeight);
 	}
 }
 
@@ -8721,7 +8723,6 @@ function populateMovieCanvas() {
 	$("#menuCanvas")[0].removeEventListener("click", menuClick);
 	$("#menuCanvas")[0].addEventListener("click", menuClick);
 	let ctx = canvas.getContext("2d");
-	let movieRatio = video.clientWidth / video.clientHeight;
 	canvas.width = $(".center.pane").innerWidth();
 	canvas.height = $(".top.pane").innerHeight();
 	video.addEventListener("play", function() {
@@ -8729,7 +8730,7 @@ function populateMovieCanvas() {
 		canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 		(function loop() {
 			if (!$this.paused && !$this.ended) {
-				drawMovieFrame(video, canvas, ctx, movieRatio);
+				drawMovieFrame(video, canvas, ctx, $this.clientWidth/$this.clientHeight);
 				setTimeout(loop, 1000/movieFPS);
 			}
 		})();
