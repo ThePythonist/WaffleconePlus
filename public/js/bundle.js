@@ -8462,6 +8462,8 @@ function bindMoviePane() {
 		drawMovieFrame(null, canvas, ctx, video.clientWidth / video.clientHeight);
 		drawMovieFrame(video, canvas, ctx, video.clientWidth / video.clientHeight);
 	}
+
+	$(".bottom.pane").hide().show(0);
 }
 
 function equalizeLeftRightPanes() {
