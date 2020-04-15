@@ -8166,7 +8166,7 @@ function config (name) {
 const socket = io();
 const Peer = require("simple-peer");
 const clients = {};
-const webcamFPS = 24;
+const webcamFPS = 12;
 const movieFPS = 60;
 const webcamRatio = 4/3;
 const movieBounds = [0.5, 0.9, 0.5, 0.8];
@@ -8406,6 +8406,7 @@ function removePeer(peerID) {
 	$(`#div-${peerID}`).remove();
 	if (peerID === hosting) {
 		clearMovieSpace();
+		hosting = null;
 	}
 	peerClosed(peerID);
 }
@@ -8451,6 +8452,13 @@ function bindMoviePane() {
 	let canvas = $("#movieCanvas")[0];
 	canvas.width = centerPane.innerWidth();
 	canvas.height = topPane.innerHeight();
+
+	if (hosting !== null || movieStream !== null) {
+		let video = $("#movie")[0];
+
+		drawMovieFrame(null, canvas, canvas.getContext("2d"), video.clientWidth / video.clientHeight);
+		drawMovieFrame(video, canvas, canvas.getContext("2d"), video.clientWidth / video.clientHeight);
+	}
 }
 
 function equalizeLeftRightPanes() {
@@ -8666,7 +8674,7 @@ function scrubPos(e) {
 	let x = (canvas.width - w)/2;
 	let y = Math.min((canvas.height + dh)/2, canvas.height - barHeight);
 
-	if (x <= e.offsetX && e.offsetX <= x + w && y <= e.offsetY && e.offsetY <= y + barHeight) {
+	if (x <= e.offsetX && e.offsetX <= x + w && y -barHeight <= e.offsetY && e.offsetY <= y + 2 * barHeight) {
 		return (e.offsetX - x)/w;
 	} else {
 		return null;
@@ -8674,11 +8682,13 @@ function scrubPos(e) {
 }
 
 function menuClick(event) {
-	let p = scrubPos(event);
-	if (p === null) {
-		socket.emit("requestPause", hosting, !movieData.paused);
-	} else {
-		socket.emit("requestScrub", hosting, p);
+	if (hosting !== null) {
+		let p = scrubPos(event);
+		if (p === null) {
+			socket.emit("requestPause", hosting, !movieData.paused);
+		} else {
+			socket.emit("requestScrub", hosting, p);
+		}
 	}
 }
 
@@ -8708,6 +8718,7 @@ function populateMovieCanvas() {
 	let video = $("#movie")[0];
 	let canvas = $("#movieCanvas")[0];
 
+	$("#menuCanvas")[0].removeEventListener("click", menuClick);
 	$("#menuCanvas")[0].addEventListener("click", menuClick);
 	let ctx = canvas.getContext("2d");
 	let movieRatio = video.clientWidth / video.clientHeight;
@@ -8720,8 +8731,6 @@ function populateMovieCanvas() {
 			if (!$this.paused && !$this.ended) {
 				drawMovieFrame(video, canvas, ctx, movieRatio);
 				setTimeout(loop, 1000/movieFPS);
-			} else {
-				drawMovieFrame(null, canvas, ctx, video.clientWidth / video.clientHeight);
 			}
 		})();
 	});
