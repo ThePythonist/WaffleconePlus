@@ -31,24 +31,34 @@ socket.on("connect", () => {
 			let file = this.files[0];
 			let movie = $("#movie")[0];
 			if (movie.canPlayType(file.type) !== "") {
-				movie.pause();
-				movie.removeAttribute('src');
-				if (movie.srcObject) {
-					for(let i of movie.srcObject.getTracks()) {
-						i.stop();
+				try {
+					if (sUsrAg.indexOf('Firefox') > -1) {
+						movie.mozCaptureStream();
+					} else {
+						movie.captureStream();
 					}
-					movie.srcObject = null;
-				}
-				movie.src = URL.createObjectURL(file);
-				movie.load();
-				movie.currentTime = 0;
-				movie.pause();
+					movie.pause();
+					movie.removeAttribute('src');
+					if (movie.srcObject) {
+						for(let i of movie.srcObject.getTracks()) {
+							i.stop();
+						}
+						movie.srcObject = null;
+					}
+					movie.src = URL.createObjectURL(file);
+					movie.load();
+					movie.currentTime = 0;
+					movie.pause();
 
-				populateMovieCanvas();
-				movieData.paused = true;
-				movieData.time = 0;
-				movieData.duration = 0;
-				movie.addEventListener("canplay", streamMovie);
+					populateMovieCanvas();
+					movieData.paused = true;
+					movieData.time = 0;
+					movieData.duration = 0;
+					movie.addEventListener("canplay", streamMovie);
+				} catch {
+					alert("Your browser does not support uploading movies. If you are unwilling to apologise then a simple nod of recognition will suffice.");
+				}
+				
 			} else {
 				alert("I can't event play that video. Please get better.");
 			}
