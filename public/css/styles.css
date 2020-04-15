@@ -75,7 +75,7 @@ body {
 }
 
 .streamCanvas, .streamMenu {
-    display: inline-block;
+    /*display: inline-block;*/
 }
 
 .streamCanvas {
@@ -184,6 +184,7 @@ button:active, label:active {
 	display: inline-block;
 	position: relative;
     height: 90%;
+    width: auto;
     transform: translateY(5.555556%);
     border: 3px solid black;
 }
@@ -193,6 +194,7 @@ button:active, label:active {
 	position: absolute;
 	width: 100%;
     height: 100%;
+    top: 0px;
     left: 0px;
 	z-index: 50;
     background: rgba(255, 255, 255, 0.3);
