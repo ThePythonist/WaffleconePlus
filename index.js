@@ -50,6 +50,11 @@ io.on("connection", (socket) => {
 		io.sockets.in(this.room).emit("spam-emoji", data);
 	});
 
+	socket.on("headpat", function(recipient) {
+		socket.broadcast.to(this.room).emit("headpat", recipient);
+		io.to(recipient).emit("headpat-me");
+	});
+
 });
 
 function disconnect() {

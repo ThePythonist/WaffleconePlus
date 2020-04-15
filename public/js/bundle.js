@@ -8182,7 +8182,7 @@ const barPadding = 10;
 const handleRadius = 10;
 const scrubTimeFontSize = 25;
 
-const emoji = ["grin", "face with hearts", "heart", "kiss", "hug", "wink", "heart eyes", "crazy"];
+const emoji = ["grin", "face with hearts", "heart", "kiss", "hug", "wink", "heart eyes", "crazy", "transflag", "frog"];
 
 socket.on("connect", () => {
 	let vars = getParams(window.location.href);
@@ -8218,11 +8218,11 @@ socket.on("connect", () => {
 			myStream.play();
 			let myCanvas = $("#myCanvas")[0];
 
-			playVideoOnCanvas(myStream, myCanvas);
+			playVideoOnCanvas(myStream, myCanvas, $("#myMenu")[0]);
 			let canvasStream = myCanvas.captureStream(webcamFPS);
 			let tracks = canvasStream.getVideoTracks().concat(stream.getAudioTracks());
 			let combined = new MediaStream(tracks);
-
+			$("#emojiDiv").empty();
 			for (let e of emoji) {
 				let button = $("<button type='button'></button>");
 				let img = $(`<img class='emoji' src='/img/emoji/${e}.png'></img>`);
@@ -8295,9 +8295,44 @@ socket.on("connect", () => {
 			socket.on("spam", showSpam);
 			socket.on("spam-emoji", showSpamEmoji);
 
+			socket.on("headpat", function(recipient) {
+				if (recipient in clients) {
+					headpat(recipient);
+				}
+			});
+
+			socket.on("headpat-me", function() {
+				headpat(null);
+			})
+
 		});
 	}
 });
+
+function headpat(peerID) {
+	let parent = (peerID === null)? "#myStreamDiv" : `#div-${peerID}`;
+	let handDiv = $("<div class='hand'></div>");
+	let handImg = $(`<img src='/img/hand.png' width='${$(parent).outerWidth()}px'></img>`);
+	handDiv.append(handImg);
+	console.log(parent);
+	$(parent).append(handDiv);
+	headpatFloat(handDiv[0], Date.now(), $(parent).innerHeight());
+}
+
+function headpatFloat(element, startTime, videoHeight) {
+	let frequency = 0.02;
+	let amplitude = 0.25 * videoHeight;
+	let count = 5;
+	let t = (Date.now()-startTime) * frequency;
+	let x = Math.cos(t) * amplitude + 0.15 * videoHeight;
+	element.style.marginTop = `-${x}px`;
+	if (t <= 2 * count * Math.PI) {
+		setTimeout(() => {headpatFloat(element, startTime, videoHeight)}, 1000/60);
+	} else {
+		element.remove();
+	}
+}
+
 
 function showSpam(message) {
 	let spamDiv = document.createElement("div");
@@ -8357,6 +8392,7 @@ function loadImages() {
 function removePeer(peerID) {
 	$(`#video-${peerID}`).remove();
 	$(`#canvas-${peerID}`).remove();
+	$(`#div-${peerID}`).remove();
 	if (peerID === hosting) {
 		clearMovieSpace();
 	}
@@ -8421,7 +8457,7 @@ function bindWebcamPane() {
 function mindWebcamPlacement() {
 	let webcamPane = $(".bottom.pane");
 	if(webcamPane[0].clientHeight !== webcamPane[0].scrollHeight){
-		$(".streamCanvas").addClass("overflow");
+		$(".shrink").addClass("overflow");
 		let topPane = $(".top.pane");
 		try {
 			let maxHeight = topPane.resizable("option", "maxHeight");
@@ -8433,9 +8469,9 @@ function mindWebcamPlacement() {
 
 		}
 	} else {
-		$(".streamCanvas").removeClass("overflow");
+		$(".shrink").removeClass("overflow");
 		if(webcamPane[0].clientHeight !== webcamPane[0].scrollHeight){
-			$(".streamCanvas").addClass("overflow");
+			$(".shrink").addClass("overflow");
 		}
 	}
 }
@@ -8484,7 +8520,7 @@ function setupHandles() {
 	});
 }
 
-function playVideoOnCanvas(video, canvas) {
+function playVideoOnCanvas(video, canvas, menu) {
 	let ctx = canvas.getContext("2d");
 	video.addEventListener("play", function() {
 		let $this = this;
@@ -8492,6 +8528,8 @@ function playVideoOnCanvas(video, canvas) {
 			if (!$this.paused && !$this.ended) {
 				canvas.width = Math.min(webcamRatio*video.clientHeight, video.clientWidth);
 				canvas.height = Math.min(canvas.width / webcamRatio, video.clientHeight);
+				menu.style.width = canvas.width;
+				menu.style.height = canvas.height;
 				let x = (canvas.width - $this.clientWidth)/2;
 				let y = (canvas.height - $this.clientHeight)/2;
 				ctx.drawImage($this, x, y);
@@ -8763,11 +8801,21 @@ function gotStream(peerID, stream) {
 		let parent = $(".bottom.pane");
 		parent.append(newStream);
 
-		let newCanvas = $(`<canvas id='canvas-${peerID}' class='streamCanvas'></canvas>'`);
+		let newCanvas = $(`<canvas id='canvas-${peerID}' class='streamCanvas'></canvas>`);
+		let newMenu = $(`<div id='menu-${peerID}' class='streamMenu'></div>`);
 
-		parent.append(newCanvas);
+		let label = "<img src='/img/hand.png'></img>";
+		let headpatButton = $(`<button type='button' class='menuButton'>${label}</button>`);
+		headpatButton[0].addEventListener("click", () => {headpat(peerID); socket.emit("headpat", peerID);});
+		newMenu.append(headpatButton);
 
-		playVideoOnCanvas(newStream[0], newCanvas[0]);
+		let newDiv = $(`<div id='div-${peerID}' class='shrink'></div>`);
+		newDiv.append(newCanvas);
+		newDiv.append(newMenu);
+
+		parent.append(newDiv);
+
+		playVideoOnCanvas(newStream[0], newCanvas[0], newMenu[0]);
 	} else {
 		hosting = peerID;
 		movieData.paused = true;
