@@ -8450,10 +8450,10 @@ function bindMoviePane() {
 
 	}
 
+	fitEmojiDiv();
 	equalizeLeftRightPanes();
 	bindWebcamPane();
 	mindWebcamPlacement();
-	fitEmojiDiv();
 
 	$(".bottom.pane").hide().show(0);
 }
@@ -8473,7 +8473,9 @@ function fitEmojiDiv() {
 function equalizeLeftRightPanes() {
 	let leftPane = $(".left.pane");
 	let rightPane = $(".right.pane");
-	let newWidth = (leftPane.outerWidth() + rightPane.outerWidth())/2;
+	let centerPane = $(".center.pane");
+	let inner = $(".inner");
+	let newWidth = (inner.outerWidth() - centerPane.outerWidth())/2;
 	leftPane.css({width: newWidth});
 	rightPane.css({width: newWidth});
 }
