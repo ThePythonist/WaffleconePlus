@@ -8768,8 +8768,8 @@ function constructPeer(peerID, initiator, stream) {
 		socket.emit("signal", peerID, data);
 	})
 
-	peer.on("close", function () {peerClosed(peerID)});
-	peer.on("error", function () {peerClosed(peerID)});
+	peer.on("close", function () {removePeer(peerID)});
+	peer.on("error", function () {removePeer(peerID)});
 }
 
 function peerClosed (peerID) {
