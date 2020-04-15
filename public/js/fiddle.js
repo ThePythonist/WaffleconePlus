@@ -32,10 +32,17 @@ socket.on("connect", () => {
 			if (movie.canPlayType(file.type) !== "") {
 				movie.pause();
 				movie.removeAttribute('src');
-				movie.removeAttribute('srcObject');
-				movie.load();
-
+				if (movie.srcObject) {
+					for(let i of movie.srcObject.getTracks()) {
+						i.stop();
+					}
+					movie.srcObject = null;
+				}
 				movie.src = URL.createObjectURL(file);
+				movie.load();
+				movie.currentTime = 0;
+				movie.pause();
+
 				populateMovieCanvas();
 				let canvas = $("#movieCanvas")[0];
 				movieData.paused = true;
@@ -154,7 +161,6 @@ function headpat(peerID) {
 	let handDiv = $("<div class='hand'></div>");
 	let handImg = $(`<img src='/img/hand.png' width='${$(parent).outerWidth()}px'></img>`);
 	handDiv.append(handImg);
-	console.log(parent);
 	$(parent).append(handDiv);
 	headpatFloat(handDiv[0], Date.now(), $(parent).innerHeight());
 }
@@ -549,6 +555,8 @@ function populateMovieCanvas() {
 			if (!$this.paused && !$this.ended) {
 				drawMovieFrame(video, canvas, ctx, movieRatio);
 				setTimeout(loop, 1000/movieFPS);
+			} else {
+				drawMovieFrame(null, canvas, ctx, video.clientWidth / video.clientHeight);
 			}
 		})();
 	});
@@ -597,6 +605,9 @@ function addUpdateEventListeners() {
 function streamMovie() {
 	hosting = null;
 	let video = $("#movie")[0];
+	video.pause();
+	let canvas = $("#movieCanvas")[0];
+	video.removeEventListener("canplay", streamMovie);
 	$("#menuCanvas")[0].removeEventListener("click", myMenuClick);
 	$("#menuCanvas")[0].addEventListener("click", myMenuClick);
 
@@ -615,7 +626,6 @@ function streamMovie() {
 	for (let peerID in clients) {
 		clients[peerID].addStream(movieStream);
 	}
-
 }
 
 
@@ -691,9 +701,14 @@ function gotStream(peerID, stream) {
 		let movie = $("#movie")[0];
 		movie.pause();
 		movie.removeAttribute('src');
-		movie.removeAttribute('srcObject');
-		movie.load();
+		if (movie.srcObject) {
+			for(let i of movie.srcObject.getTracks()) {
+				i.stop();
+			}
+			movie.srcObject = null;
+		}
 		movie.srcObject = stream;
+		movie.load();
 		populateMovieCanvas();
 		movie.addEventListener("canplay", movie.play);
 	}
