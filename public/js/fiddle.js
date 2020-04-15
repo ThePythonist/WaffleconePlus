@@ -30,6 +30,11 @@ socket.on("connect", () => {
 			let file = this.files[0];
 			let movie = $("#movie")[0];
 			if (movie.canPlayType(file.type) !== "") {
+				movie.pause();
+				movie.removeAttribute('src');
+				movie.removeAttribute('srcObject');
+				movie.load();
+
 				movie.src = URL.createObjectURL(file);
 				populateMovieCanvas();
 				let canvas = $("#movieCanvas")[0];
@@ -422,7 +427,12 @@ function menuOverlay(e) {
 		if (s !== null) {
 			ctx.lineWidth = 1;
 			ctx.fillStyle = "#FFFFFF";
-			let hoverText = new Date(s * movieData.duration * 1000).toISOString().substr(11, 8);
+			let hoverText = "*:**:**";
+			try {
+				hoverText = new Date(s * movieData.duration * 1000).toISOString().substr(11, 8);
+			} catch {
+
+			}
 			hoverTextWidth = ctx.measureText(hoverText).width;
 			ctx.fillText(hoverText, e.offsetX, y+barHeight+scrubTimeFontSize);
 			ctx.strokeText(hoverText, e.offsetX, y+barHeight+scrubTimeFontSize);
@@ -436,7 +446,12 @@ function menuOverlay(e) {
 
 		ctx.lineWidth = 1;
 		ctx.fillStyle = "#FFFFFF";
-		let t = new Date(movieData.time * 1000).toISOString().substr(11, 8);
+		let t = "*:**:**";
+		try {
+			t = new Date(movieData.time * 1000).toISOString().substr(11, 8);
+		} catch {
+
+		}
 		let textWidth = ctx.measureText(t).width;
 		let tx = Math.min(Math.max(x+filledW, textWidth/2), canvas.width-textWidth/2);
 		if (s === null || e.offsetX - hoverTextWidth/2 > tx+textWidth/2 || e.offsetX + hoverTextWidth/2 < tx-textWidth/2) {
@@ -445,7 +460,12 @@ function menuOverlay(e) {
 		}
 
 		ctx.textAlign = "right";
-		t = new Date(movieData.duration * 1000).toISOString().substr(11, 8);
+		t = "*:**:**";
+		try {
+			t = new Date(movieData.duration * 1000).toISOString().substr(11, 8);
+		} catch {
+
+		}
 		let endTextWidth = ctx.measureText(t).width;
 		if (x+filledW+textWidth/2 < x+w-endTextWidth) {
 			if (s === null || e.offsetX + hoverTextWidth/2 < x+w-endTextWidth) {
@@ -584,7 +604,11 @@ function streamMovie() {
 	addUpdateEventListeners();
 	if (movieStream !== null) {
 		for (let peerID in clients) {
-			clients[peerID].removeStream(movieStream);
+			try {
+				clients[peerID].removeStream(movieStream);
+			} catch {
+
+			}
 		}
 	}
 	movieStream = video.captureStream();
@@ -665,9 +689,13 @@ function gotStream(peerID, stream) {
 			movieStream = null;
 		}
 		let movie = $("#movie")[0];
+		movie.pause();
+		movie.removeAttribute('src');
+		movie.removeAttribute('srcObject');
+		movie.load();
 		movie.srcObject = stream;
 		populateMovieCanvas();
-		movie.play();
+		movie.addEventListener("canplay", movie.play);
 	}
 
 }
