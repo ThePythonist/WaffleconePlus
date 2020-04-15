@@ -41,7 +41,7 @@ body {
 }
 
 .inner {
-    display: flex;
+	display: flex;
 }
 
 .pane {
@@ -80,7 +80,7 @@ body {
 }
 
 .streamCanvas {
-    height: 100%;
+	height: 100%;
 }
 
 .shrink.overflow {
@@ -88,7 +88,7 @@ body {
 }
 
 .shrink.overflow .streamMenu {
-    display: none;
+	display: none;
 }
 
 .ui-resizable-handle.show {
@@ -113,9 +113,9 @@ label {
 
 #menuCanvas {
 	position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
+	left: 50%;
+	top: 50%;
+	transform: translateX(-50%) translateY(-50%);
 }
 
 
@@ -155,15 +155,14 @@ button:active, label:active {
 }
 
 #emojiDiv {
-    /*max-height: 50%;*/
-    overflow-y: auto;
+	overflow-y: auto;
 }
 
 #spamDiv input {
 	text-align: center;
 	font-weight: bold;
 	font-size: 25px;
-    width: 75%;
+	width: 75%;
 }
 
 .spam, .hand {
@@ -174,7 +173,7 @@ button:active, label:active {
 
 .hand {
 	left: 0px;
-    top: 0px;
+	top: 0px;
 }
 
 .spam {
@@ -193,66 +192,100 @@ button:active, label:active {
 .shrink {
 	display: inline-block;
 	position: relative;
-    height: 90%;
-    width: auto;
-    transform: translateY(5.555556%);
-    border: 3px solid black;
+	height: 90%;
+	width: auto;
+	transform: translateY(5.555556%);
+	border: 3px solid black;
 }
 
 .streamMenu {
-    opacity: 0;
+	opacity: 0;
 	position: absolute;
 	width: 100%!important;
-    height: 100%!important;
-    top: 0px;
-    left: 0px;
+	height: 100%!important;
+	top: 0px;
+	left: 0px;
 	z-index: 50;
-    background: rgba(255, 255, 255, 0.3);
+	background: rgba(255, 255, 255, 0.3);
 }
 
 
 
 .streamMenu:hover {
-    opacity: 100%;
+	opacity: 100%;
 }
 
 .menuButton {
-    width: 90%;
-    height: 20%;
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0px;
-    position: relative;
+	width: 90%;
+	height: 20%;
+	margin-top: auto;
+	margin-bottom: auto;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0px;
+	position: relative;
 }
 
 .menuButton img {
-    height: 100%;
-    margin: 0px;
-    padding: 0px;
-    top: 0px;
-    left: 50%;
-    transform: translateX(-50%);
-    position: absolute;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	top: 0px;
+	left: 50%;
+	transform: translateX(-50%);
+	position: absolute;
 }
 
 *:focus {
-    outline: none;
+	outline: none;
 }
 
 .logo {
-    width: 20%;
-    display: inline-block;
-    margin-top: 10px;
+	width: 20%;
+	display: inline-block;
+	margin-top: 10px;
 }
 
 .movie {
-    position: absolute;
-    display: inline-block;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    width: 100%;
-    height: 100%;
+	position: absolute;
+	display: inline-block;
+	left: 50%;
+	top: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	width: 100%;
+	height: 100%;
+}
+
+#fullscreenButton {
+	background-color: #00177d;
+	height: 50px;
+	width: 50px;
+	padding: 0px;
+	position: relative;
+}
+
+#fullscreenButton:hover {
+    background-color: #001057;
+}
+
+#fullscreenButton:active {
+    background-color: #00082e;
+}
+
+#fullscreenButton img {
+	position:absolute;
+	height: 50%;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+    filter: invert(100%);
+    transition: all .1s ease-in-out;
+}
+
+#fullscreenButton img:hover {
+    height: 90%;
+}
+
+.hidden {
+	display: none;
 }

@@ -8183,6 +8183,9 @@ const barPadding = 10;
 const handleRadius = 10;
 const scrubTimeFontSize = 25;
 
+let fullscreen = false;
+
+
 const emoji = ["grin", "laugh", "face with hearts", "heart", "tongue", "kiss", "hug", "wink", "heart eyes", "crazy", "cry", "thumbs up", "gay", "transflag", "frog"];
 
 socket.on("connect", () => {
@@ -8192,6 +8195,19 @@ socket.on("connect", () => {
 		document.body.innerText = "Invalid room. Please apologise.";
 	} else {
 		setupHandles();
+		$("#fullscreenButton")[0].addEventListener("click", function(e) {
+			if (fullscreen) {
+				closeFullscreen();
+				$("#maxIcon").addClass("hidden");
+				$("#minIcon").removeClass("hidden");
+			} else {
+				openFullscreen();
+				$("#minIcon").addClass("hidden");
+				$("#maxIcon").removeClass("hidden");
+
+			}
+			fullscreen ^= 1;
+		});
 		$("#movieSelector")[0].addEventListener("change", function(e) {
 			let file = this.files[0];
 			let movie = $("#movie")[0];
