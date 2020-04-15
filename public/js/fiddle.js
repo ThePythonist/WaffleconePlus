@@ -288,8 +288,21 @@ function bindMoviePane() {
 	equalizeLeftRightPanes();
 	bindWebcamPane();
 	mindWebcamPlacement();
+	fitEmojiDiv();
 
 	$(".bottom.pane").hide().show(0);
+}
+
+function fitEmojiDiv() {
+	let leftPane = $(".left.pane")[0];
+	let emojiDiv = $("#emojiDiv");
+	
+	if(leftPane.clientHeight === leftPane.scrollHeight && emojiDiv[0].scrollHeight > 0) {
+		emojiDiv.height(emojiDiv[0].scrollHeight);
+	}
+	if (leftPane.clientHeight < leftPane.scrollHeight) {
+		emojiDiv.height(emojiDiv.height()-leftPane.scrollHeight+leftPane.clientHeight);
+	}
 }
 
 function equalizeLeftRightPanes() {

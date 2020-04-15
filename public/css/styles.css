@@ -36,12 +36,16 @@ body {
 
 .inner-wrapper,
 .top .inner {
-	display: table;
 	width: 100%;
 	height: 100%;
 }
+
+.inner {
+    display: flex;
+}
+
 .pane {
-	display: table-cell;
+	display: inline-block;
 }
 .left.pane {
 	vertical-align: top;
@@ -151,7 +155,7 @@ button:active, label:active {
 }
 
 #emojiDiv {
-    max-height: 450px;
+    /*max-height: 50%;*/
     overflow-y: auto;
 }
 
@@ -159,6 +163,7 @@ button:active, label:active {
 	text-align: center;
 	font-weight: bold;
 	font-size: 25px;
+    width: 75%;
 }
 
 .spam, .hand {
