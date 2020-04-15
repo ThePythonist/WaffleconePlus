@@ -8341,7 +8341,7 @@ function showSpam(message) {
 	document.body.appendChild(spamDiv);
 	spamDiv.style.top = "100%";
 	spamDiv.style.left = ""+(document.body.clientWidth-spamDiv.clientWidth)/2+"px";
-	floatSpam(spamDiv);
+	floatSpam(spamDiv, null, Date.now());
 }
 
 function showSpamEmoji(name) {
@@ -8353,14 +8353,14 @@ function showSpamEmoji(name) {
 	document.body.appendChild(spamDiv);
 	spamDiv.style.top = "100%";
 	spamDiv.style.left = ""+(document.body.clientWidth-spamDiv.clientWidth)/2+"px";
-	floatSpam(spamDiv);
+	floatSpam(spamDiv, null, Date.now());
 }
 
-function floatSpam(element, simplexNoise) {
+function floatSpam(element, simplexNoise, lastTime) {
 	let seed = Date.now();
 	let roughness = 0.005;
 	let amplitude = 5;
-	let speed = 7;
+	let speed = 0.5;
 	if (!simplexNoise) {
 		simplexNoise = openSimplexNoise(seed);
 	}
@@ -8368,7 +8368,7 @@ function floatSpam(element, simplexNoise) {
 	if (element.style.marginTop === "") {
 		top = 0;
 	}
-	element.style.marginTop = "" + (top - speed) + "px";
+	element.style.marginTop = "" + (top - speed*(seed-lastTime)) + "px";
 
 	let left = parseInt(element.style.marginLeft);
 	if (element.style.marginLeft === "") {
@@ -8376,7 +8376,7 @@ function floatSpam(element, simplexNoise) {
 	}
 	element.style.marginLeft = "" + (left + simplexNoise.noise2D(0, seed*roughness)*amplitude) + "px";
 	if (top > -element.clientHeight-document.body.clientHeight) {
-		setTimeout(() => {floatSpam(element, simplexNoise)}, 1000/60);
+		setTimeout(() => {floatSpam(element, simplexNoise, seed)}, 1000/60);
 	} else {
 		element.remove();
 	}
