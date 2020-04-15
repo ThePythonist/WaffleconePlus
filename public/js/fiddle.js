@@ -595,8 +595,7 @@ function streamMovie() {
 
 function constructPeer(peerID, initiator, stream) {
 	let peer = new Peer({initiator: initiator,
-						 stream: stream,
-						 trickle: false});
+						 stream: stream});
 	clients[peerID] = peer;
 
 	peer.on("stream", (stream) => {gotStream(peerID, stream)});
