@@ -58,6 +58,7 @@ socket.on("connect", () => {
 		});
 
 		navigator.mediaDevices.getUserMedia({video: true, audio:true}).then(stream => {
+			bindMoviePane();
 			socket.emit("newConnection", room);
 			loadImages();
 			let myStream = $("#myStream")[0];
