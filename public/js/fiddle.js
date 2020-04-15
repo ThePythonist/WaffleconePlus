@@ -11,6 +11,7 @@ const movieData = {};
 let room;
 let hosting = null;
 let movieStream = null;
+const sUsrAg = navigator.userAgent;
 
 const barHeight = 10;
 const barPadding = 10;
@@ -635,7 +636,12 @@ function streamMovie() {
 			}
 		}
 	}
-	movieStream = video.captureStream();
+
+	if (sUsrAg.indexOf('Firefox') > -1) {
+	  movieStream = video.mozCaptureStream();
+	} else {
+	  movieStream = video.captureStream();
+	}
 	for (let peerID in clients) {
 		clients[peerID].addStream(movieStream);
 	}
