@@ -45,14 +45,10 @@ socket.on("connect", () => {
 				movie.pause();
 
 				populateMovieCanvas();
-				let canvas = $("#movieCanvas")[0];
 				movieData.paused = true;
 				movieData.time = 0;
 				movieData.duration = 0;
 				movie.addEventListener("canplay", streamMovie);
-				movie.addEventListener("loadeddata", () => {
-					drawMovieFrame(null, canvas, canvas.getContext("2d"), movie.clientWidth / movie.clientHeight);
-				});
 			} else {
 				alert("I can't event play that video. Please get better.");
 			}
@@ -135,8 +131,6 @@ socket.on("connect", () => {
 				if (hosting === null && movieStream !== null) {
 					let movie = $("#movie")[0];
 					movie.currentTime = p * movie.duration;
-					let canvas = $("#movieCanvas")[0];
-					drawMovieFrame(movie, canvas, canvas.getContext("2d"), video.clientWidth/video.clientHeight);
 					sendMovieData();
 				}
 			});
@@ -285,20 +279,6 @@ function bindMoviePane() {
 	bindWebcamPane();
 	mindWebcamPlacement();
 
-
-	let canvas = $("#movieCanvas")[0];
-	canvas.width = centerPane.innerWidth();
-	canvas.height = topPane.innerHeight();
-
-	if (hosting !== null || movieStream !== null) {
-		let video = $("#movie")[0];
-
-		let ctx = canvas.getContext("2d")
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		drawMovieFrame(null, canvas, ctx, video.clientWidth / video.clientHeight);
-		drawMovieFrame(video, canvas, ctx, video.clientWidth / video.clientHeight);
-	}
-
 	$(".bottom.pane").hide().show(0);
 }
 
@@ -386,8 +366,8 @@ function playVideoOnCanvas(video, canvas, menu) {
 		let $this = this;
 		(function loop() {
 			if (!$this.paused && !$this.ended) {
-				canvas.width = Math.min(webcamRatio*video.clientHeight, video.clientWidth);
-				canvas.height = Math.min(canvas.width / webcamRatio, video.clientHeight);
+				canvas.width = Math.min(webcamRatio*video.videoHeight, video.videoWidth);
+				canvas.height = Math.min(canvas.width / webcamRatio, video.videoHeight);
 				menu.style.width = canvas.width;
 				menu.style.height = canvas.height;
 				let x = (canvas.width - $this.clientWidth)/2;
@@ -402,16 +382,17 @@ function playVideoOnCanvas(video, canvas, menu) {
 function menuOverlay(e) {
 	if (hosting !== null || movieStream !== null) {
 		let canvas = $("#menuCanvas")[0]
-		let movieCanvas = $("#movieCanvas")[0];
-		canvas.width = movieCanvas.width;
-		canvas.height = movieCanvas.height;
+		let video = $("#movie")[0];
+		canvas.width = $(video).outerWidth();
+		canvas.height = $(video).outerHeight() + 2 * (barHeight + scrubTimeFontSize);
+		canvas.style.width = canvas.width+"px";
+		canvas.style.height = canvas.height+"px";
 		let ctx = canvas.getContext("2d");
 		let icon = movieData.paused? icons["play"]: icons["pause"];
 		let iconSize = 50;
 		ctx.drawImage(icon, (canvas.width-iconSize)/2, (canvas.height-iconSize)/2, iconSize, iconSize);
-		let video = $("#movie")[0];
 
-		let movieRatio = video.clientWidth/video.clientHeight;
+		let movieRatio = video.videoWidth/video.videoHeight;
 		let dw = canvas.width;
 		let dh = canvas.height;
 		if (dw/dh < movieRatio) {
@@ -502,7 +483,7 @@ function scrubPos(e) {
 	let video = $("#movie")[0];
 	let canvas = $("#menuCanvas")[0];
 
-	let movieRatio = video.clientWidth/video.clientHeight;
+	let movieRatio = video.videoWidth/video.videoHeight;
 	let dw = canvas.width;
 	let dh = canvas.height;
 	if (dw/dh < movieRatio) {
@@ -556,49 +537,14 @@ function sendMovieData() {
 }
 
 function populateMovieCanvas() {
-	let video = $("#movie")[0];
-	let canvas = $("#movieCanvas")[0];
-
 	$("#menuCanvas")[0].removeEventListener("click", menuClick);
 	$("#menuCanvas")[0].addEventListener("click", menuClick);
-	let ctx = canvas.getContext("2d");
-	canvas.width = $(".center.pane").innerWidth();
-	canvas.height = $(".top.pane").innerHeight();
-	video.addEventListener("play", function() {
-		let $this = this;
-		canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-		(function loop() {
-			if (!$this.paused && !$this.ended) {
-				drawMovieFrame(video, canvas, ctx, $this.clientWidth/$this.clientHeight);
-				setTimeout(loop, 1000/movieFPS);
-			}
-		})();
-	});
 }
 
-function drawMovieFrame(video, canvas, ctx, movieRatio) {
-	let dw = canvas.width;
-	let dh = canvas.height;
-	if (dw/dh < movieRatio) {
-		dh = dw/movieRatio;
-	} else {
-		dw = dh * movieRatio;
-	}
-	let x = (canvas.width - dw)/2;
-	let y = (canvas.height - dh)/2;
-	if (video === null) {
-		ctx.fillStyle = "#000000";
-		ctx.fillRect(x, y, dw, dh);
-	} else {
-		ctx.drawImage(video, x, y, dw, dh);
-	}
-}
 
 function clearMovieSpace() {
 	$("#movie")[0].srcObject = null;
 	$("#menuCanvas")[0].removeEventListener("click", menuClick);
-	let canvas = $("#movieCanvas")[0];
-	canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function removeUpdateEventListeners() {
@@ -620,7 +566,6 @@ function streamMovie() {
 	hosting = null;
 	let video = $("#movie")[0];
 	video.pause();
-	let canvas = $("#movieCanvas")[0];
 	video.removeEventListener("canplay", streamMovie);
 	$("#menuCanvas")[0].removeEventListener("click", myMenuClick);
 	$("#menuCanvas")[0].addEventListener("click", myMenuClick);
