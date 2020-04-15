@@ -289,3 +289,9 @@ button:active, label:active {
 .hidden {
 	display: none;
 }
+
+.error {
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
+}

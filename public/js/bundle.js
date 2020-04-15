@@ -8192,7 +8192,7 @@ socket.on("connect", () => {
 	let vars = getParams(window.location.href);
 	room = vars["room"];
 	if (room === null || room === undefined || !/^[A-za-z0-9-_]+$/.test(room)) {
-		document.body.innerText = "Invalid room. Please apologise.";
+		document.body.innerHTML = "<p class='error'>Invalid room. Please apologise.</p>";
 	} else {
 		setupHandles();
 		$("#fullscreenButton")[0].addEventListener("click", function(e) {
@@ -8248,101 +8248,105 @@ socket.on("connect", () => {
 			}
 		});
 
-		navigator.mediaDevices.getUserMedia({video: true, audio:true}).then(stream => {
-			bindMoviePane();
-			socket.emit("newConnection", room);
-			loadImages();
-			let myStream = $("#myStream")[0];
-			myStream.srcObject = stream;
-			myStream.play();
-			let myCanvas = $("#myCanvas")[0];
+		try {
+			navigator.mediaDevices.getUserMedia({video: true, audio:true}).then(stream => {
+				bindMoviePane();
+				socket.emit("newConnection", room);
+				loadImages();
+				let myStream = $("#myStream")[0];
+				myStream.srcObject = stream;
+				myStream.play();
+				let myCanvas = $("#myCanvas")[0];
 
-			playVideoOnCanvas(myStream, myCanvas, $("#myMenu")[0]);
-			let canvasStream = myCanvas.captureStream(webcamFPS);
-			let tracks = canvasStream.getVideoTracks().concat(stream.getAudioTracks());
-			let combined = new MediaStream(tracks);
-			$("#emojiDiv").empty();
-			for (let e of emoji) {
-				let button = $("<button type='button'></button>");
-				let img = $(`<img class='emoji' src='/img/emoji/${e}.png'></img>`);
-				button.append(img);
-				button[0].addEventListener("click", function() {
-					this.blur();
-					socket.emit("spam-emoji", e);
+				playVideoOnCanvas(myStream, myCanvas, $("#myMenu")[0]);
+				let canvasStream = myCanvas.captureStream(webcamFPS);
+				let tracks = canvasStream.getVideoTracks().concat(stream.getAudioTracks());
+				let combined = new MediaStream(tracks);
+				$("#emojiDiv").empty();
+				for (let e of emoji) {
+					let button = $("<button type='button'></button>");
+					let img = $(`<img class='emoji' src='/img/emoji/${e}.png'></img>`);
+					button.append(img);
+					button[0].addEventListener("click", function() {
+						this.blur();
+						socket.emit("spam-emoji", e);
+					});
+					$("#emojiDiv").append(button);
+				}
+
+				$("#spamDiv input")[0].addEventListener("keyup", function(event) {
+					if (event.keyCode === 13) {
+						spam();
+					}
 				});
-				$("#emojiDiv").append(button);
-			}
 
-			$("#spamDiv input")[0].addEventListener("keyup", function(event) {
-				if (event.keyCode === 13) {
-					spam();
-				}
-			});
-
-			socket.on("peerIDs", (peerIDs) => {
-				for (let peerID in clients) {
-					removePeer(peerID);
-					delete clients[peerID];
-				}
-				for (let i=0; i<peerIDs.length; i++) {
-					constructPeer(peerIDs[i], true, combined);
-				}
-			});
-
-			socket.on("peerSignal", (peerID, data) => {
-				if (!(peerID in clients)) {
-					constructPeer(peerID, false, combined);
-					if (movieStream !== null) {
-						clients[peerID].addStream(movieStream);
+				socket.on("peerIDs", (peerIDs) => {
+					for (let peerID in clients) {
+						removePeer(peerID);
+						delete clients[peerID];
 					}
-				}
-				clients[peerID].signal(data);
-			});
-
-			socket.on("peerDisconnected", (peerID) => {
-				if (peerID in clients) {
-					removePeer(peerID);
-				}
-			});
-
-			socket.on("movieData", (data) => {
-				movieData.paused = data.paused;
-				movieData.time = data.time;
-				movieData.duration = data.duration;
-			});
-
-			socket.on("requestPause", (paused) => {
-				if (hosting === null && movieStream !== null) {
-					if (paused) {
-						$("#movie")[0].pause();
-					} else {
-						$("#movie")[0].play();
+					for (let i=0; i<peerIDs.length; i++) {
+						constructPeer(peerIDs[i], true, combined);
 					}
-				}
+				});
+
+				socket.on("peerSignal", (peerID, data) => {
+					if (!(peerID in clients)) {
+						constructPeer(peerID, false, combined);
+						if (movieStream !== null) {
+							clients[peerID].addStream(movieStream);
+						}
+					}
+					clients[peerID].signal(data);
+				});
+
+				socket.on("peerDisconnected", (peerID) => {
+					if (peerID in clients) {
+						removePeer(peerID);
+					}
+				});
+
+				socket.on("movieData", (data) => {
+					movieData.paused = data.paused;
+					movieData.time = data.time;
+					movieData.duration = data.duration;
+				});
+
+				socket.on("requestPause", (paused) => {
+					if (hosting === null && movieStream !== null) {
+						if (paused) {
+							$("#movie")[0].pause();
+						} else {
+							$("#movie")[0].play();
+						}
+					}
+				});
+
+				socket.on("requestScrub", (p) => {
+					if (hosting === null && movieStream !== null) {
+						let movie = $("#movie")[0];
+						movie.currentTime = p * movie.duration;
+						sendMovieData();
+					}
+				});
+
+				socket.on("spam", showSpam);
+				socket.on("spam-emoji", showSpamEmoji);
+
+				socket.on("headpat", function(recipient) {
+					if (recipient in clients) {
+						headpat(recipient);
+					}
+				});
+
+				socket.on("headpat-me", function() {
+					headpat(null);
+				})
+
 			});
-
-			socket.on("requestScrub", (p) => {
-				if (hosting === null && movieStream !== null) {
-					let movie = $("#movie")[0];
-					movie.currentTime = p * movie.duration;
-					sendMovieData();
-				}
-			});
-
-			socket.on("spam", showSpam);
-			socket.on("spam-emoji", showSpamEmoji);
-
-			socket.on("headpat", function(recipient) {
-				if (recipient in clients) {
-					headpat(recipient);
-				}
-			});
-
-			socket.on("headpat-me", function() {
-				headpat(null);
-			})
-
-		});
+		} catch {
+			document.body.innerHTML = "<p class='error'>Wafflecone is not supported on this browser. You should be ashamed.</p>";	
+		}
 	}
 });
 
