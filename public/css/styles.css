@@ -87,7 +87,7 @@ body {
 }
 
 .ui-resizable-handle.show {
-	background-color: white;
+	background-color: #002570;
 	border: 1px solid black;
 }
 
