@@ -87,7 +87,11 @@ socket.on("connect", () => {
 		});
 
 		try {
-			$("<audio></audio>")[0].captureStream();
+			if (sUsrAg.indexOf('Firefox') > -1) {
+				$("<audio></audio>")[0].mozCaptureStream();
+			} else {
+				$("<audio></audio>")[0].captureStream();
+			}
 			navigator.mediaDevices.getUserMedia({video: true, audio:true}).then(stream => {
 				bindMoviePane();
 				socket.emit("newConnection", room);
