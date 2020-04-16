@@ -87,6 +87,7 @@ socket.on("connect", () => {
 		});
 
 		try {
+			$("<audio></audio>")[0].captureStream();
 			navigator.mediaDevices.getUserMedia({video: true, audio:true}).then(stream => {
 				bindMoviePane();
 				socket.emit("newConnection", room);
@@ -117,9 +118,6 @@ socket.on("connect", () => {
 					button[0].addEventListener("click", function() {
 						this.blur();
 						socket.emit("spam-emoji", e);
-						for (let peerID in clients) {
-							console.log(clients[peerID].streams[0].getAudioTracks());
-						}
 					});
 					$("#emojiDiv").append(button);
 				}
@@ -441,7 +439,6 @@ function setupHandles() {
 }
 
 function playAudioOnElement(stream, audioElement) {
-	console.log(stream);
 	audioElement.srcObject = stream;
 }
 
