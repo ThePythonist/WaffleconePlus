@@ -8308,6 +8308,10 @@ socket.on("connect", () => {
 					}
 				});
 
+				$("#volumeSlider")[0].addEventListener("change", function() {
+					$("#movie")[0].volume = this.value;
+				});
+
 				socket.on("peerIDs", (peerIDs) => {
 					for (let peerID in clients) {
 						removePeer(peerID);
@@ -8790,12 +8794,17 @@ function sendMovieData() {
 function populateMovieCanvas() {
 	$("#menuCanvas")[0].removeEventListener("click", menuClick);
 	$("#menuCanvas")[0].addEventListener("click", menuClick);
+
+	$("#volumeSlider")[0].value = 1;
+	$("#volumeSlider").removeClass("hidden");
 }
 
 
 function clearMovieSpace() {
 	$("#movie")[0].srcObject = null;
 	$("#menuCanvas")[0].removeEventListener("click", menuClick);
+
+	$("#volumeSlider").addClass("hidden");
 }
 
 function removeUpdateEventListeners() {

@@ -41,8 +41,10 @@
 						<div class="right pane">
 							<img src="/img/yinyang.png" class="logo"></img>
 							<br />
+							<input type="range" min="0" max="1" value="1" step="0.01" class="slider hidden" id="volumeSlider"/>
+							<br />
 							<input id="movieSelector" type="file" accept=".mp4,.ogg,.webm" />
-							<label for="movieSelector">Choose a movie</label>
+							<label id="movieLabel" for="movieSelector">Choose a movie</label>
 							<br />
 							<button type="button" id="fullscreenButton">
 								<img id="minIcon" src="/img/icons/max.svg" />
