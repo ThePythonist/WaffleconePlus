@@ -282,7 +282,7 @@ button:active, label:active {
     transition: all .1s ease-in-out;
 }
 
-#fullscreenButton img:hover, .webcamControlButton img:hover {
+#fullscreenButton:hover img, .webcamControlButton:hover img {
     height: 90%;
 }
 
