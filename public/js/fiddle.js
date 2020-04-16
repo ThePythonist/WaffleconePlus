@@ -480,7 +480,17 @@ function menuOverlay(e) {
 
 		let w = dw - (2 * barPadding);
 		let x = (canvas.width - w)/2;
-		let y = Math.min((canvas.height + dh)/2, canvas.height - barHeight);
+
+		let vw = video.clientWidth;
+		let vh = video.clientHeight;
+		if (vw/vh < movieRatio) {
+			vh = vw/movieRatio;
+		} else {
+			vw = vh * movieRatio;
+		}
+
+		let y = (canvas.height + vh)/2;
+
 		ctx.fillStyle = "#FFFFFF";
 		ctx.strokeStyle = "#000000";
 		ctx.lineWidth = 5;
@@ -504,7 +514,7 @@ function menuOverlay(e) {
 		let hoverTextWidth = 0;
 		if (s !== null) {
 			ctx.lineWidth = 1;
-			ctx.fillStyle = "#FFFFFF";
+			ctx.fillStyle = "#000000";
 			let hoverText = "*:**:**";
 			try {
 				hoverText = new Date(s * movieData.duration * 1000).toISOString().substr(11, 8);
@@ -513,7 +523,6 @@ function menuOverlay(e) {
 			}
 			hoverTextWidth = ctx.measureText(hoverText).width;
 			ctx.fillText(hoverText, e.offsetX, y+barHeight+scrubTimeFontSize);
-			ctx.strokeText(hoverText, e.offsetX, y+barHeight+scrubTimeFontSize);
 			ctx.fillStyle = "#34EB8F";
 			ctx.lineWidth = 5;
 			ctx.beginPath();
@@ -523,7 +532,7 @@ function menuOverlay(e) {
 		}
 
 		ctx.lineWidth = 1;
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = "#000000";
 		let t = "*:**:**";
 		try {
 			t = new Date(movieData.time * 1000).toISOString().substr(11, 8);
@@ -534,7 +543,6 @@ function menuOverlay(e) {
 		let tx = Math.min(Math.max(x+filledW, textWidth/2), canvas.width-textWidth/2);
 		if (s === null || e.offsetX - hoverTextWidth/2 > tx+textWidth/2 || e.offsetX + hoverTextWidth/2 < tx-textWidth/2) {
 			ctx.fillText(t, tx, y+barHeight+scrubTimeFontSize);
-			ctx.strokeText(t, tx, y+barHeight+scrubTimeFontSize);
 		}
 
 		ctx.textAlign = "right";
@@ -548,7 +556,6 @@ function menuOverlay(e) {
 		if (x+filledW+textWidth/2 < x+w-endTextWidth) {
 			if (s === null || e.offsetX + hoverTextWidth/2 < x+w-endTextWidth) {
 				ctx.fillText(t, x+w, y+barHeight+scrubTimeFontSize);
-				ctx.strokeText(t, x+w, y+barHeight+scrubTimeFontSize);
 			}
 		}	
 
@@ -571,7 +578,15 @@ function scrubPos(e) {
 
 	let w = dw - (2 * barPadding);
 	let x = (canvas.width - w)/2;
-	let y = Math.min((canvas.height + dh)/2, canvas.height - barHeight);
+	let vw = video.clientWidth;
+	let vh = video.clientHeight;
+	if (vw/vh < movieRatio) {
+		vh = vw/movieRatio;
+	} else {
+		vw = vh * movieRatio;
+	}
+
+	let y = (canvas.height + vh)/2;
 
 	if (x <= e.offsetX && e.offsetX <= x + w && y -barHeight <= e.offsetY && e.offsetY <= y + 2 * barHeight) {
 		return (e.offsetX - x)/w;
