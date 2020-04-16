@@ -294,6 +294,10 @@ input[type=range]::-moz-focus-outer {
 	transition: all .1s ease-in-out;
 }
 
+.webcamControlButton img.disabled {
+    filter: invert(100%) sepia(100%) saturate(10000%) brightness(50%) hue-rotate(290deg) drop-shadow(16px 16px 10px black)
+}
+
 #fullscreenButton:hover img, .webcamControlButton:hover img {
 	height: 90%;
 }

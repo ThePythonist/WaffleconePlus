@@ -8447,6 +8447,8 @@ function loadImages() {
 	icons["play"].src = "./img/icons/play.svg";
 	icons["pause"] = new Image();
 	icons["pause"].src = "./img/icons/pause.svg";
+	icons["wafflecone"] = new Image();
+	icons["wafflecone"].src = "./img/wafflecone.png";
 }
 
 function removePeer(peerID) {
@@ -8608,8 +8610,20 @@ function playVideoOnCanvas(video, canvas, menu) {
 				menu.style.width = canvas.width;
 				menu.style.height = canvas.height;
 				if (canvas.id === "myCanvas" && !$("#webcamControlButton .disabled").hasClass("hidden")) {
-					ctx.fillStyle = "#FF0000";
+					ctx.fillStyle = "#415B5C";
 					ctx.fillRect(0, 0, canvas.width, canvas.height);
+					let w = icons["wafflecone"].width;
+					let h = icons["wafflecone"].height;
+					if (canvas.width/canvas.height > w/h) {
+						w = w/h * canvas.height;
+						h = canvas.height;
+					} else {
+						h = h/w * canvas.width;
+						w = canvas.width;
+					}
+					let x = (canvas.width-w)/2;
+					ctx.drawImage(icons["wafflecone"], (canvas.width-w)/2, (canvas.height-h)/2, w, h);
+
 				} else {
 					let x = (canvas.width - $this.clientWidth)/2;
 					let y = (canvas.height - $this.clientHeight)/2;
