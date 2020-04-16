@@ -62,4 +62,4 @@ function disconnect() {
 	io.sockets.in(this.room).emit("peerDisconnected", this.id);
 }
 
-// http.listen(port, () => console.log(`listening on port ${port}`));
+http.listen(port, () => console.log(`listening on port ${port}`));

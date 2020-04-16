@@ -20,6 +20,11 @@ const scrubTimeFontSize = 25;
 
 let fullscreen = false;
 
+if (location.protocol !== 'https:') {
+    location.replace(`https:${location.href.substring(location.protocol.length)}`);
+}
+
+
 
 const emoji = ["grin", "laugh", "face with hearts", "heart", "tongue", "kiss", "hug", "wink", "heart eyes", "crazy", "cry", "thumbs up", "gay", "transflag", "frog"];
 
