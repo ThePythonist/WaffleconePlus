@@ -19,13 +19,21 @@ body {
 	z-index: -100;
 }
 
-.header {
+.footer {
 	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 20px;
+	bottom: 3px;
+	right: 3px;
 }
+
+.footer p {
+    margin: 0px;
+    text-align: right;
+}
+
+.footer a {
+    color: white;
+}
+
 .wrapper {
 	position:absolute;
 	top: 21px;
@@ -432,4 +440,8 @@ input[type=range].slider:focus::-ms-fill-upper {
 
 ::-webkit-scrollbar-thumb:hover {
 	background: #555; 
+}
+
+.terms {
+
 }
