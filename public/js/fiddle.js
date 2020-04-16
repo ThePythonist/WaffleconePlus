@@ -11,7 +11,6 @@ const movieData = {};
 let room;
 let hosting = null;
 let movieStream = null;
-const sUsrAg = navigator.userAgent;
 
 const barHeight = 10;
 const barPadding = 10;
@@ -20,43 +19,42 @@ const scrubTimeFontSize = 25;
 
 let fullscreen = false;
 
+const emoji = ["grin", "laugh", "face with hearts", "heart", "tongue", "kiss", "hug", "wink", "heart eyes", "crazy", "cry", "thumbs up", "gay", "transflag", "frog"];
+
 if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && location.protocol !== "https:") {
     location.replace(`https:${location.href.substring(location.protocol.length)}`);
 }
 
-const emoji = ["grin", "laugh", "face with hearts", "heart", "tongue", "kiss", "hug", "wink", "heart eyes", "crazy", "cry", "thumbs up", "gay", "transflag", "frog"];
+var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+if (!isChrome) {
+	location.href = "/badbrowser.html";
+} else {
+	socket.on("connect", () => {
+		let vars = getParams(window.location.href);
+		room = vars["id"];
+		if (room === null || room === undefined || !/^[A-za-z0-9-_]+$/.test(room)) {
+			document.body.innerHTML = "<p class='error'>Invalid room. Please apologise.</p>";
+		} else {
+			setupHandles();
+			$("#fullscreenButton")[0].addEventListener("click", function(e) {
+				if (fullscreen) {
+					closeFullscreen();
+					$("#maxIcon").addClass("hidden");
+					$("#minIcon").removeClass("hidden");
+				} else {
+					openFullscreen();
+					$("#minIcon").addClass("hidden");
+					$("#maxIcon").removeClass("hidden");
 
-socket.on("connect", () => {
-	let vars = getParams(window.location.href);
-	room = vars["room"];
-	if (room === null || room === undefined || !/^[A-za-z0-9-_]+$/.test(room)) {
-		document.body.innerHTML = "<p class='error'>Invalid room. Please apologise.</p>";
-	} else {
-		setupHandles();
-		$("#fullscreenButton")[0].addEventListener("click", function(e) {
-			if (fullscreen) {
-				closeFullscreen();
-				$("#maxIcon").addClass("hidden");
-				$("#minIcon").removeClass("hidden");
-			} else {
-				openFullscreen();
-				$("#minIcon").addClass("hidden");
-				$("#maxIcon").removeClass("hidden");
-
-			}
-			fullscreen ^= 1;
-		});
-		$("#movieSelector")[0].addEventListener("change", function(e) {
-			if ($(this).val !== "") {
-				let file = this.files[0];
-				let movie = $("#movie")[0];
-				if (movie.canPlayType(file.type) !== "") {
-					try {
-						if (sUsrAg.indexOf('Firefox') > -1) {
-							movie.mozCaptureStream();
-						} else {
-							movie.captureStream();
-						}
+				}
+				fullscreen ^= 1;
+			});
+			$("#movieSelector")[0].addEventListener("change", function(e) {
+				if ($(this).val !== "") {
+					let file = this.files[0];
+					let movie = $("#movie")[0];
+					if (movie.canPlayType(file.type) !== "") {
+						movie.captureStream();
 						movie.pause();
 						movie.removeAttribute('src');
 						if (movie.srcObject) {
@@ -74,150 +72,138 @@ socket.on("connect", () => {
 						movieData.paused = true;
 						movieData.time = 0;
 						movieData.duration = 0;
-						movie.addEventListener("canplay", streamMovie);
-					} catch {
-						alert("Your browser does not support uploading movies. If you are unwilling to apologise then a simple nod of recognition will suffice.");
-					}
-					
-				} else {
-					alert("I can't event play that video. Please get better.");
-				}
-				$(this).val("");
-			}
-		});
-
-		try {
-			if (sUsrAg.indexOf('Firefox') > -1) {
-				$("<audio></audio>")[0].mozCaptureStream();
-			} else {
-				$("<audio></audio>")[0].captureStream();
-			}
-			navigator.mediaDevices.getUserMedia({video: true, audio:true}).then(stream => {
-				bindMoviePane();
-				socket.emit("newConnection", room);
-				loadImages();
-				let myStream = $("#myStream")[0];
-				myStream.srcObject = stream;
-				myStream.play();
-				let myCanvas = $("#myCanvas")[0];
-				let myAudio = $("#myAudio")[0];
-
-				playVideoOnCanvas(myStream, myCanvas, $("#myMenu")[0]);
-				playAudioOnElement(stream, myAudio);
-				let canvasStream = myCanvas.captureStream(webcamFPS);
-				let audioStream = null;
-				if (sUsrAg.indexOf('Firefox') > -1) {
-				  audioStream = myAudio.mozCaptureStream();
-				} else {
-				  audioStream = myAudio.captureStream();
-				}
-
-				let tracks = canvasStream.getVideoTracks().concat(audioStream.getAudioTracks());
-				let combined = new MediaStream(tracks);
-				$("#emojiDiv").empty();
-				for (let e of emoji) {
-					let button = $("<button type='button'></button>");
-					let img = $(`<img class='emoji' src='/img/emoji/${e}.png'></img>`);
-					button.append(img);
-					button[0].addEventListener("click", function() {
-						this.blur();
-						socket.emit("spam-emoji", e);
-					});
-					$("#emojiDiv").append(button);
-				}
-
-				$("#spamDiv input")[0].addEventListener("keyup", function(event) {
-					if (event.keyCode === 13) {
-						spam();
-					}
-				});
-
-				$("#webcamControlButton")[0].addEventListener("click", function(event) {
-					$("#webcamControlButton .disabled").toggleClass("hidden");
-				});
-
-				$("#microphoneControlButton")[0].addEventListener("click", function(event) {
-					$("#microphoneControlButton .disabled").toggleClass("hidden");
-					if ($("#microphoneControlButton .disabled").hasClass("hidden")) {
-						audioStream.getAudioTracks()[0].enabled = true;
+						movie.addEventListener("canplay", streamMovie);					
 					} else {
-						audioStream.getAudioTracks()[0].enabled = false;
+						alert("I can't event play that video. Please get better.");
 					}
-				});
-
-				$("#volumeSlider")[0].addEventListener("change", function() {
-					$("#movie")[0].volume = this.value;
-				});
-
-				socket.on("peerIDs", (peerIDs) => {
-					for (let peerID in clients) {
-						removePeer(peerID);
-						delete clients[peerID];
-					}
-					for (let i=0; i<peerIDs.length; i++) {
-						constructPeer(peerIDs[i], true, combined);
-					}
-				});
-
-				socket.on("peerSignal", (peerID, data) => {
-					if (!(peerID in clients)) {
-						constructPeer(peerID, false, combined);
-						if (movieStream !== null) {
-							clients[peerID].addStream(movieStream);
-						}
-					}
-					clients[peerID].signal(data);
-				});
-
-				socket.on("peerDisconnected", (peerID) => {
-					if (peerID in clients) {
-						removePeer(peerID);
-					}
-				});
-
-				socket.on("movieData", (data) => {
-					movieData.paused = data.paused;
-					movieData.time = data.time;
-					movieData.duration = data.duration;
-				});
-
-				socket.on("requestPause", (paused) => {
-					if (hosting === null && movieStream !== null) {
-						if (paused) {
-							$("#movie")[0].pause();
-						} else {
-							$("#movie")[0].play();
-						}
-					}
-				});
-
-				socket.on("requestScrub", (p) => {
-					if (hosting === null && movieStream !== null) {
-						let movie = $("#movie")[0];
-						movie.currentTime = p * movie.duration;
-						sendMovieData();
-					}
-				});
-
-				socket.on("spam", showSpam);
-				socket.on("spam-emoji", showSpamEmoji);
-
-				socket.on("headpat", function(recipient) {
-					if (recipient in clients) {
-						headpat(recipient);
-					}
-				});
-
-				socket.on("headpat-me", function() {
-					headpat(null);
-				})
-
+					$(this).val("");
+				}
 			});
-		} catch {
-			document.body.innerHTML = "<p class='error'>Wafflecone is not supported on this browser. You should be ashamed.</p>";	
+
+			try {
+				navigator.mediaDevices.getUserMedia({video: true, audio:true}).then(stream => {
+					bindMoviePane();
+					socket.emit("newConnection", room);
+					loadImages();
+					let myStream = $("#myStream")[0];
+					myStream.srcObject = stream;
+					myStream.play();
+					let myCanvas = $("#myCanvas")[0];
+					let myAudio = $("#myAudio")[0];
+
+					playVideoOnCanvas(myStream, myCanvas, $("#myMenu")[0]);
+					playAudioOnElement(stream, myAudio);
+					let canvasStream = myCanvas.captureStream(webcamFPS);
+					let audioStream = null;
+					audioStream = myAudio.captureStream();
+
+					let tracks = canvasStream.getVideoTracks().concat(audioStream.getAudioTracks());
+					let combined = new MediaStream(tracks);
+					$("#emojiDiv").empty();
+					for (let e of emoji) {
+						let button = $("<button type='button'></button>");
+						let img = $(`<img class='emoji' src='/img/emoji/${e}.png'></img>`);
+						button.append(img);
+						button[0].addEventListener("click", function() {
+							this.blur();
+							socket.emit("spam-emoji", e);
+						});
+						$("#emojiDiv").append(button);
+					}
+
+					$("#spamDiv input")[0].addEventListener("keyup", function(event) {
+						if (event.keyCode === 13) {
+							spam();
+						}
+					});
+
+					$("#webcamControlButton")[0].addEventListener("click", function(event) {
+						$("#webcamControlButton .disabled").toggleClass("hidden");
+					});
+
+					$("#microphoneControlButton")[0].addEventListener("click", function(event) {
+						$("#microphoneControlButton .disabled").toggleClass("hidden");
+						if ($("#microphoneControlButton .disabled").hasClass("hidden")) {
+							audioStream.getAudioTracks()[0].enabled = true;
+						} else {
+							audioStream.getAudioTracks()[0].enabled = false;
+						}
+					});
+
+					$("#volumeSlider")[0].addEventListener("change", function() {
+						$("#movie")[0].volume = this.value;
+					});
+
+					socket.on("peerIDs", (peerIDs) => {
+						for (let peerID in clients) {
+							removePeer(peerID);
+							delete clients[peerID];
+						}
+						for (let i=0; i<peerIDs.length; i++) {
+							constructPeer(peerIDs[i], true, combined);
+						}
+					});
+
+					socket.on("peerSignal", (peerID, data) => {
+						if (!(peerID in clients)) {
+							constructPeer(peerID, false, combined);
+							if (movieStream !== null) {
+								clients[peerID].addStream(movieStream);
+							}
+						}
+						clients[peerID].signal(data);
+					});
+
+					socket.on("peerDisconnected", (peerID) => {
+						if (peerID in clients) {
+							removePeer(peerID);
+						}
+					});
+
+					socket.on("movieData", (data) => {
+						movieData.paused = data.paused;
+						movieData.time = data.time;
+						movieData.duration = data.duration;
+					});
+
+					socket.on("requestPause", (paused) => {
+						if (hosting === null && movieStream !== null) {
+							if (paused) {
+								$("#movie")[0].pause();
+							} else {
+								$("#movie")[0].play();
+							}
+						}
+					});
+
+					socket.on("requestScrub", (p) => {
+						if (hosting === null && movieStream !== null) {
+							let movie = $("#movie")[0];
+							movie.currentTime = p * movie.duration;
+							sendMovieData();
+						}
+					});
+
+					socket.on("spam", showSpam);
+					socket.on("spam-emoji", showSpamEmoji);
+
+					socket.on("headpat", function(recipient) {
+						if (recipient in clients) {
+							headpat(recipient);
+						}
+					});
+
+					socket.on("headpat-me", function() {
+						headpat(null);
+					})
+
+				});
+			} catch {
+				location.href = "/badbrowser.html";	
+			}
 		}
-	}
-});
+	});
+}
 
 function headpat(peerID) {
 	let parent = (peerID === null)? "#myStreamDiv" : `#div-${peerID}`;
@@ -678,11 +664,7 @@ function streamMovie() {
 		}
 	}
 
-	if (sUsrAg.indexOf('Firefox') > -1) {
-	  movieStream = video.mozCaptureStream();
-	} else {
-	  movieStream = video.captureStream();
-	}
+	movieStream = video.captureStream();
 	for (let peerID in clients) {
 		clients[peerID].addStream(movieStream);
 	}

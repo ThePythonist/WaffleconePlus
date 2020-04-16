@@ -11,68 +11,6 @@
 		<link rel="icon" href="/img/yinyang.png">
 	</head>
 	<body>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="./js/simplexNoise.js"></script>
-		<script src="./js/tools.js"></script>
-		<script src="./js/bundle.js"></script>
-
-		<div class="header">
-			
-		</div>
-		<div class="wrapper">
-			<div class="inner-wrapper">
-				<div class="top pane">
-					<div class="inner">
-						<div class="left pane">
-							<img src="/img/lightbulb.png" class="logo"></img>
-							<br />
-							<div id="emojiDiv">
-							</div>
-							<div id="spamDiv">
-								<input type="text" class="form-control" placeholder="message"></input>
-							</div>
-						</div>
-						<div class="center pane">
-							<div class="movieContainer">
-								<video id="movie" class="movie"></video>
-								<canvas id="menuCanvas"></canvas>
-							</div>
-						</div>
-						<div class="right pane">
-							<img src="/img/yinyang.png" class="logo"></img>
-							<br />
-							<br />
-							<input type="range" min="0" max="1" value="1" step="0.01" class="slider hidden" id="volumeSlider"/>
-							<br />
-							<input id="movieSelector" type="file" accept=".mp4,.ogg,.webm" />
-							<label id="movieLabel" for="movieSelector">Choose a movie</label>
-							<br />
-							<button type="button" id="fullscreenButton">
-								<img id="minIcon" src="/img/icons/max.svg" />
-								<img id="maxIcon" src="/img/icons/min.svg" class="hidden" />
-							</button>
-						</div>
-					</div>
-				</div>
-				<div class="bottom pane">
-					<video id="myStream" class="stream" muted></video>
-					<div id="myStreamDiv" class="shrink">
-						<canvas id="myCanvas" class="streamCanvas"></canvas>
-						<audio id="myAudio" muted controls autoplay></audio>
-						<div id="myMenu" class="streamMenu">
-							<button type="button" id="webcamControlButton" class="webcamControlButton">
-								<img id="webcamIcon" src="/img/icons/webcam.svg"/>
-								<img class="disabled hidden" src="/img/icons/disabled.svg"/>
-							</button>
-							<button type="button" id="microphoneControlButton" class="webcamControlButton">
-								<img id="microphoneIcon" src="/img/icons/microphone.svg"/>
-								<img class="disabled hidden" src="/img/icons/disabled.svg"/>
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
+		<h1>Wafflecone</h1>
 	</body>
 </html>
