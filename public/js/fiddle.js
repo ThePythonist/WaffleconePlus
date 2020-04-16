@@ -24,8 +24,6 @@ if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && lo
     location.replace(`https:${location.href.substring(location.protocol.length)}`);
 }
 
-
-
 const emoji = ["grin", "laugh", "face with hearts", "heart", "tongue", "kiss", "hug", "wink", "heart eyes", "crazy", "cry", "thumbs up", "gay", "transflag", "frog"];
 
 socket.on("connect", () => {
@@ -97,10 +95,19 @@ socket.on("connect", () => {
 				myStream.srcObject = stream;
 				myStream.play();
 				let myCanvas = $("#myCanvas")[0];
+				let myAudio = $("#myAudio")[0];
 
 				playVideoOnCanvas(myStream, myCanvas, $("#myMenu")[0]);
+				playAudioOnElement(stream, myAudio);
 				let canvasStream = myCanvas.captureStream(webcamFPS);
-				let tracks = canvasStream.getVideoTracks().concat(stream.getAudioTracks());
+				let audioStream = null;
+				if (sUsrAg.indexOf('Firefox') > -1) {
+				  audioStream = myAudio.mozCaptureStream();
+				} else {
+				  audioStream = myAudio.captureStream();
+				}
+
+				let tracks = canvasStream.getVideoTracks().concat(audioStream.getAudioTracks());
 				let combined = new MediaStream(tracks);
 				$("#emojiDiv").empty();
 				for (let e of emoji) {
@@ -110,6 +117,9 @@ socket.on("connect", () => {
 					button[0].addEventListener("click", function() {
 						this.blur();
 						socket.emit("spam-emoji", e);
+						for (let peerID in clients) {
+							console.log(clients[peerID].streams[0].getAudioTracks());
+						}
 					});
 					$("#emojiDiv").append(button);
 				}
@@ -117,6 +127,19 @@ socket.on("connect", () => {
 				$("#spamDiv input")[0].addEventListener("keyup", function(event) {
 					if (event.keyCode === 13) {
 						spam();
+					}
+				});
+
+				$("#webcamControlButton")[0].addEventListener("click", function(event) {
+					$("#webcamControlButton .disabled").toggleClass("hidden");
+				});
+
+				$("#microphoneControlButton")[0].addEventListener("click", function(event) {
+					$("#microphoneControlButton .disabled").toggleClass("hidden");
+					if ($("#microphoneControlButton .disabled").hasClass("hidden")) {
+						audioStream.getAudioTracks()[0].enabled = true;
+					} else {
+						audioStream.getAudioTracks()[0].enabled = false;
 					}
 				});
 
@@ -413,6 +436,11 @@ function setupHandles() {
 	});
 }
 
+function playAudioOnElement(stream, audioElement) {
+	console.log(stream);
+	audioElement.srcObject = stream;
+}
+
 function playVideoOnCanvas(video, canvas, menu) {
 	let ctx = canvas.getContext("2d");
 	video.addEventListener("play", function() {
@@ -423,9 +451,14 @@ function playVideoOnCanvas(video, canvas, menu) {
 				canvas.height = Math.min(canvas.width / webcamRatio, video.videoHeight);
 				menu.style.width = canvas.width;
 				menu.style.height = canvas.height;
-				let x = (canvas.width - $this.clientWidth)/2;
-				let y = (canvas.height - $this.clientHeight)/2;
-				ctx.drawImage($this, x, y);
+				if (canvas.id === "myCanvas" && !$("#webcamControlButton .disabled").hasClass("hidden")) {
+					ctx.fillStyle = "#FF0000";
+					ctx.fillRect(0, 0, canvas.width, canvas.height);
+				} else {
+					let x = (canvas.width - $this.clientWidth)/2;
+					let y = (canvas.height - $this.clientHeight)/2;
+					ctx.drawImage($this, x, y);
+				}
 				setTimeout(loop, 1000/webcamFPS);
 			}
 		})();

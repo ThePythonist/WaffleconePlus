@@ -256,7 +256,7 @@ button:active, label:active {
 	height: 100%;
 }
 
-#fullscreenButton {
+#fullscreenButton, .webcamControlButton {
 	background-color: #00177d;
 	height: 50px;
 	width: 50px;
@@ -264,15 +264,15 @@ button:active, label:active {
 	position: relative;
 }
 
-#fullscreenButton:hover {
+#fullscreenButton:hover, .webcamControlButton:hover {
     background-color: #001057;
 }
 
-#fullscreenButton:active {
+#fullscreenButton:active, .webcamControlButton:active {
     background-color: #00082e;
 }
 
-#fullscreenButton img {
+#fullscreenButton img, .webcamControlButton img {
 	position:absolute;
 	height: 50%;
 	top: 50%;
@@ -282,7 +282,7 @@ button:active, label:active {
     transition: all .1s ease-in-out;
 }
 
-#fullscreenButton img:hover {
+#fullscreenButton img:hover, .webcamControlButton img:hover {
     height: 90%;
 }
 
@@ -294,4 +294,8 @@ button:active, label:active {
     text-align: center;
     font-size: 50px;
     font-weight: bold;
+}
+
+audio {
+    display: none;
 }

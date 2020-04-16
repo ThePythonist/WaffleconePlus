@@ -55,7 +55,17 @@
 					<video id="myStream" class="stream" muted></video>
 					<div id="myStreamDiv" class="shrink">
 						<canvas id="myCanvas" class="streamCanvas"></canvas>
-						<div id="myMenu" class="streamMenu"></div>
+						<audio id="myAudio" muted controls autoplay></audio>
+						<div id="myMenu" class="streamMenu">
+							<button type="button" id="webcamControlButton" class="webcamControlButton">
+								<img id="webcamIcon" src="/img/icons/webcam.svg"/>
+								<img class="disabled hidden" src="/img/icons/disabled.svg"/>
+							</button>
+							<button type="button" id="microphoneControlButton" class="webcamControlButton">
+								<img id="microphoneIcon" src="/img/icons/microphone.svg"/>
+								<img class="disabled hidden" src="/img/icons/disabled.svg"/>
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
