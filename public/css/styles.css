@@ -158,6 +158,10 @@ button:active, label:active {
 	overflow-y: auto;
 }
 
+#emojiDiv button  {
+    display: inline-flex;
+}
+
 #spamDiv input {
 	text-align: center;
 	font-weight: bold;
