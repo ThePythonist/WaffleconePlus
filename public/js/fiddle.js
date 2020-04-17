@@ -25,8 +25,7 @@ if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && lo
 	location.replace(`https:${location.href.substring(location.protocol.length)}`);
 }
 
-var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-if (!isChrome) {
+if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor)) {
 	location.href = "/badbrowser.html";
 } else {
 	socket.on("connect", () => {

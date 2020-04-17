@@ -8,6 +8,11 @@
 		<link rel="icon" href="/img/yinyang.png">
 	</head>
 	<body class="error">
+		<script>
+			if (/Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)) {
+				location.href = "/index.html";
+			}
+		</script>
 		<p class="error">Wafflecone is not supported on this browser. You should be ashamed.</p>
 		<p class="error">Or maybe try Chrome or something. Chrome is great.</p>
 		<a class="error" target="_blank" href="https://www.google.com/chrome/"><img width="100" src="https://www.google.com/chrome/static/images/chrome-logo.svg" /></a>
