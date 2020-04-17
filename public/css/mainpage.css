@@ -44,7 +44,7 @@
 	background: rgb(255,255,255);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
-	-webkit-text-stroke: 0.1vw black;
+	-webkit-text-stroke: 0.05vw black;
 	-webkit-animation: fadein-two 2s; /* Safari, Chrome and Opera > 12.1 */
 	   -moz-animation: fadein-two 2s; /* Firefox < 16 */
 		-ms-animation: fadein-two 2s; /* Internet Explorer */
@@ -72,6 +72,7 @@
 
 
 .main .inner img {
+	height: 20vw;
 	-webkit-animation: fadein-five 8s; /* Safari, Chrome and Opera > 12.1 */
 	   -moz-animation: fadein-five 8s; /* Firefox < 16 */
 		-ms-animation: fadein-five 8s; /* Internet Explorer */
