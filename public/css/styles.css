@@ -10,13 +10,32 @@ body {
 	background-image: linear-gradient(to bottom right, #6e8ab1, #84648d);
 }
 
-
 .stream {
 	position: fixed;
 	top: 0px;
 	left: 0px;
 	opacity: 0;
 	z-index: -100;
+}
+
+.header {
+	position: fixed;
+	top: 3px;
+	right: 3px;
+}
+
+.header img {
+	height: 75%!important;
+	filter: none!important;
+}
+
+.header button:hover img {
+	height: 100%!important;
+}
+
+.leftheader {
+	left: 3px;
+	z-index: 50;
 }
 
 .footer {
@@ -58,7 +77,6 @@ body {
 .left.pane {
 	vertical-align: top;
 }
-
 
 .top.pane,
 .bottom.pane{
@@ -221,17 +239,16 @@ button:active, label:active {
 	background: rgba(255, 255, 255, 0.3);
 }
 
-
-
 .streamMenu:hover {
 	opacity: 100%;
 }
 
 .menuButton {
+	position: absolute;
 	width: 90%;
 	height: 20%;
-	margin-top: auto;
-	margin-bottom: auto;
+	top: 50%;
+	transform: translateY(-50%);
 	margin-left: auto;
 	margin-right: auto;
 	padding: 0px;

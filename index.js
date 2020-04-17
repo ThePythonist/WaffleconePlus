@@ -4,6 +4,10 @@ const http = require("http").Server(app);
 const io = require("socket.io")(http);
 const port = process.env.PORT || 3000;
 
+const roomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+const roomIDLength = 50;
+const tries = 1000;
+
 app.use(express.static(__dirname + "/public"));
 
 io.on("connection", (socket) => {
@@ -61,9 +65,34 @@ io.on("connection", (socket) => {
 
 	socket.on("stopdance", function() {
 		socket.broadcast.to(this.room).emit("stopdance", this.id);
-	})
+	});
+
+	socket.on("createRoom", function() {
+		let roomID = randomString(roomIDLength);
+		let room = io.sockets.adapter.rooms[roomID];
+		let attempts = 0;
+		while (attempts < tries && room !== undefined && room.length > 0) {
+			roomID = randomString(roomIDLength);
+			room = io.sockets.adapter.rooms[roomID];
+			attempts ++;
+		}
+		if (attempts >= tries) {
+			socket.emit("noRoom");
+		} else {
+			socket.emit("randomRoom", roomID);
+		}
+	});
 
 });
+
+function randomString(length) {
+	let string = "";
+	for (let i=0; i<length; i++) {
+		let index = Math.floor(Math.random() * roomChars.length);
+		string += roomChars[index];
+	}
+	return string;
+}
 
 function disconnect() {
 	console.log(`client ${this.id} disconnected`);

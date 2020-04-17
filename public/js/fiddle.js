@@ -268,7 +268,7 @@ function danceFloat(element, simplexNoise, peerID) {
 	}
 
 	if (dancing[peerID]) {
-		setTimeout(() => {danceFloat(element, simplexNoise, peerID)}, 1000/24);
+		setTimeout(() => {danceFloat(element, simplexNoise, peerID)}, 1000/48);
 	} else {
 		element.style.top = "0px";
 		element.style.left = "0px";
@@ -292,7 +292,7 @@ function headpatFloat(element, startTime, videoHeight) {
 	let x = Math.cos(t) * amplitude + 0.15 * videoHeight;
 	element.style.marginTop = `-${x}px`;
 	if (t <= 2 * count * Math.PI) {
-		setTimeout(() => {headpatFloat(element, startTime, videoHeight)}, 1000/60);
+		setTimeout(() => {headpatFloat(element, startTime, videoHeight)}, 1000/48);
 	} else {
 		element.remove();
 	}
@@ -341,7 +341,7 @@ function floatSpam(element, simplexNoise, lastTime) {
 	}
 	element.style.marginLeft = "" + (left + simplexNoise.noise2D(0, seed*roughness)*amplitude) + "px";
 	if (top > -element.clientHeight-document.body.clientHeight) {
-		setTimeout(() => {floatSpam(element, simplexNoise, seed)}, 1000/60);
+		setTimeout(() => {floatSpam(element, simplexNoise, seed)}, 1000/48);
 	} else {
 		element.remove();
 	}

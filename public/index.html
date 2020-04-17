@@ -7,18 +7,33 @@
 		<link rel="stylesheet" href="./css/styles.css">
 		<link rel="stylesheet" href="./css/mainpage.css">
 		<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
-		<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
 		<link rel="icon" href="/img/yinyang.png">
 	</head>
 	<body>
+		<script src="/socket.io/socket.io.js"></script>
 		<script>
+			const socket = io();
+
 			if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && location.protocol !== "https:") {
 				location.replace(`https:${location.href.substring(location.protocol.length)}`);
 			}
+
+			socket.on("connect", () => {
+				$("#startButton")[0].addEventListener("click", function() {
+					socket.emit("createRoom");
+				});
+
+				socket.on("randomRoom", (room) => {
+					location.href = `/room.html?id=${room}`;
+				});
+
+				socket.on("noRoom", () => {
+					alert("We couldn't find an empty room for you but full disclosure I don't actually care.");
+				});
+			});
 		</script>
 		<div class="header">
-			<button type="button" onclick="location.href = '/room.html?id=lightning-bug';">Click here to start</button>
+			<button type="button" id="startButton">Random Room</button>
 		</div>
 		<div class="main">
 			<div class="inner">
