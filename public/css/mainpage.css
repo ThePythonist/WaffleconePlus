@@ -197,3 +197,10 @@
 .header {
 	width: 100%;
 }
+
+
+@media (max-width:629px) {
+	.header {
+		display: none;
+	}
+}
