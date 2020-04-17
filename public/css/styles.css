@@ -324,7 +324,7 @@ input[type=range]::-moz-focus-outer {
     display: inline;
 }
 
-.body.error {
+body.error {
     overflow-y: auto;
 }
 
