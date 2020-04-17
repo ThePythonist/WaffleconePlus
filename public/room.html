@@ -12,6 +12,7 @@
 	</head>
 	<body>
 		<script src="/socket.io/socket.io.js"></script>
+		<script src="./js/clipboard.min.js"></script>
 		<script src="./js/simplexNoise.js"></script>
 		<script src="./js/tools.js"></script>
 		<script src="./js/bundle.js"></script>
@@ -30,7 +31,7 @@
 							<div id="emojiDiv">
 							</div>
 							<div id="spamDiv">
-								<input type="text" class="form-control" placeholder="message"></input>
+								<input type="text" placeholder="message"></input>
 							</div>
 						</div>
 						<div class="center pane">
@@ -51,6 +52,9 @@
 							<button type="button" id="fullscreenButton">
 								<img id="minIcon" src="/img/icons/max.svg" />
 								<img id="maxIcon" src="/img/icons/min.svg" class="hidden" />
+							</button>
+							<button type="button" class="webcamControlButton" id="shareButton">
+								<img id="minIcon" src="/img/icons/share.svg" />
 							</button>
 						</div>
 					</div>
@@ -86,6 +90,20 @@
 				Please be aware of our <a target="_blank" href="/legal/privacypolicy.html">Privacy Policy</a>.
 			</p>
 		</div>
-
+		<div id="shareTab" class="hidden">
+			<p>Below is your room's ID:</p>
+			<div id="roomID"></div>
+			<button type="button" id="copyID" class="webcamControlButton" data-clipboard-target="#roomID">
+				<img src="/img/icons/copy.svg" />
+			</button>
+			<br />
+			<p>Share it with anybody you want to join the room. Be careful not to let it fall into the wrong hands, as anybody who has this ID can join your room, and so can potentially steal part of your soul.</p>
+			<br />
+			<p>People can enter this ID into the main page at <a href="https://wafflecone.co.uk/">https://wafflecone.co.uk/</a>, or they can simply open the link below:</p>
+			<div id="roomURL"></div>
+			<button type="button" id="copyID" class="webcamControlButton" data-clipboard-target="#roomURL">
+				<img src="/img/icons/copy.svg" />
+			</button>
+		</div>
 	</body>
 </html>

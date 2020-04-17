@@ -8165,6 +8165,7 @@ function config (name) {
 },{}],34:[function(require,module,exports){
 const socket = io();
 const Peer = require("simple-peer");
+const clipboard = new ClipboardJS("#copyID");
 const clients = {};
 const dancing = {};
 const webcamFPS = 12;
@@ -8193,6 +8194,13 @@ if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && lo
 	location.replace(`https:${location.href.substring(location.protocol.length)}`);
 }
 
+$("body, html").on("click", function(e) {
+	if ($(e.target).closest("#shareTab, #shareButton").length === 0) {
+		$("#shareTab").addClass("hidden");
+		$(".ui-resizable-handle").removeClass("show");
+    }
+});
+
 if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor)) {
 	location.href = "/badbrowser.html";
 } else {
@@ -8200,8 +8208,10 @@ if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor))
 		let vars = getParams(window.location.href);
 		room = vars["id"];
 		if (room === null || room === undefined || !/^[A-za-z0-9-_]+$/.test(room)) {
-			document.body.innerHTML = "<p class='error'>Invalid room. Please apologise.</p>";
+			$(".wrapper").html("<p class='error'>Invalid room. Please apologise.</p>");
 		} else {
+			$("#roomID").text(room);
+			$("#roomURL").text(`https://wafflecone.co.uk/room.html?id=${room}`);
 			setupHandles();
 			$("#fullscreenButton")[0].addEventListener("click", function(e) {
 				if (fullscreen) {
@@ -8216,6 +8226,11 @@ if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor))
 				}
 				fullscreen ^= 1;
 			});
+
+			$("#shareButton")[0].addEventListener("click", function(e) {
+				$("#shareTab").toggleClass("hidden");
+			});
+
 			$("#movieSelector")[0].addEventListener("change", function(e) {
 				if ($(this).val !== "") {
 					let file = this.files[0];
@@ -8623,22 +8638,27 @@ function mindWebcamPlacement() {
 
 function mouseMove(e) {
 	lastMouseE = e;
-	let handles = $(".ui-resizable-handle").each(function (index) {
-		let pos = this.getBoundingClientRect();
-		if ($(this).hasClass("ui-resizable-e") || $(this).hasClass("ui-resizable-w")) {
-			if (e.clientX >= pos.left - resizeReach && e.clientX <= pos.right + resizeReach && e.clientY >= pos.top && e.clientY <= pos.bottom) {
-				$(this).addClass("show");
+	if ($(e.target).closest("#shareTab").length !== 0) {
+		return;
+	}
+	if ($("#shareTab").hasClass("hidden")) {
+		let handles = $(".ui-resizable-handle").each(function (index) {
+			let pos = this.getBoundingClientRect();
+			if ($(this).hasClass("ui-resizable-e") || $(this).hasClass("ui-resizable-w")) {
+				if (e.clientX >= pos.left - resizeReach && e.clientX <= pos.right + resizeReach && e.clientY >= pos.top && e.clientY <= pos.bottom) {
+					$(this).addClass("show");
+				} else {
+					$(this).removeClass("show");
+				}
 			} else {
-				$(this).removeClass("show");
+				if (e.clientY >= pos.top - resizeReach && e.clientY <= pos.bottom + resizeReach && e.clientX >= pos.left && e.clientX <= pos.right) {
+					$(this).addClass("show");
+				} else {
+					$(this).removeClass("show");
+				}
 			}
-		} else {
-			if (e.clientY >= pos.top - resizeReach && e.clientY <= pos.bottom + resizeReach && e.clientX >= pos.left && e.clientX <= pos.right) {
-				$(this).addClass("show");
-			} else {
-				$(this).removeClass("show");
-			}
-		}
-	});
+		});
+	}
 
 	let menu = $("#menuCanvas")[0]
 	let movieBox = menu.getBoundingClientRect();

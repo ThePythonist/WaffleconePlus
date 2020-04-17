@@ -74,11 +74,6 @@
 			animation: fadein-five 8s;
 }
 
-@keyframes fadein {
-	0% { opacity: 0; }
-	100% { opacity: 1; }
-}
-
 @keyframes fadein-two {
 	0% { opacity: 0; }
 	50% { opacity: 0; }
@@ -100,11 +95,6 @@
 @keyframes fadein-five {
 	0% { opacity: 0; }
 	80% { opacity: 0; }
-	100% { opacity: 1; }
-}
-
-@-moz-keyframes fadein {
-	0% { opacity: 0; }
 	100% { opacity: 1; }
 }
 
@@ -132,11 +122,6 @@
 	100% { opacity: 1; }
 }
 
-@-webkit-keyframes fadein {
-	0% { opacity: 0; }
-	100% { opacity: 1; }
-}
-
 @-webkit-keyframes fadein-two {
 	0% { opacity: 0; }
 	50% { opacity: 0; }
@@ -161,11 +146,6 @@
 	100% { opacity: 1; }
 }
 
-@-ms-keyframes fadein {
-	0% { opacity: 0; }
-	100% { opacity: 1; }
-}
-
 @-ms-keyframes fadein-two {
 	0% { opacity: 0; }
 	50% { opacity: 0; }
@@ -187,11 +167,6 @@
 @-ms-keyframes fadein-five {
 	0% { opacity: 0; }
 	80% { opacity: 0; }
-	100% { opacity: 1; }
-}
-
-@-o-keyframes fadein {
-	0% { opacity: 0; }
 	100% { opacity: 1; }
 }
 
