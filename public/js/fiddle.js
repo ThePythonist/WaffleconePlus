@@ -1,6 +1,7 @@
 const socket = io();
 const Peer = require("simple-peer");
 const clients = {};
+const dancing = {};
 const webcamFPS = 12;
 const movieFPS = 32;
 const webcamRatio = 4/3;
@@ -13,6 +14,7 @@ let hosting = null;
 let movieStream = null;
 let lastMouseE = null;
 
+const discoRoughness = 0.1;
 const barHeight = 10;
 const barPadding = 10;
 const handleRadius = 10;
@@ -130,6 +132,17 @@ if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor))
 						}
 					});
 
+					$("#danceButton")[0].addEventListener("click", function(event) {
+						$("#danceButton .disabled").toggleClass("hidden");
+						if (!$("#danceButton .disabled").hasClass("hidden")) {
+							socket.emit("dance");
+							dance(null);
+						} else {
+							socket.emit("stopdance");
+							stopDance(null);
+						}
+					});
+
 					$("#volumeSlider")[0].addEventListener("change", function() {
 						$("#movie")[0].volume = this.value;
 					});
@@ -194,9 +207,21 @@ if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor))
 						}
 					});
 
+					socket.on("dance", function(recipient) {
+						if (recipient in clients && !dancing[recipient]) {
+							dance(recipient);
+						}
+					});
+
+					socket.on("stopdance", function(recipient) {
+						if (recipient in dancing) {
+							stopDance(recipient);
+						}
+					});
+
 					socket.on("headpat-me", function() {
 						headpat(null);
-					})
+					});
 
 				});
 			} catch {
@@ -204,6 +229,50 @@ if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor))
 			}
 		}
 	});
+}
+
+function dance(peerID) {
+	let elt = $((peerID === null)? "#myCanvas" : `#canvas-${peerID}`)[0];
+	dancing[peerID] = true;
+	danceFloat(elt, null, peerID);
+}
+
+function stopDance(peerID) {
+	let elt = $((peerID === null)? "#myCanvas" : `#canvas-${peerID}`)[0];
+	dancing[peerID] = false;
+	elt.style.left = "0px";
+	elt.style.top = "0px";
+}
+
+function danceFloat(element, simplexNoise, peerID) {
+	let seed = Date.now();
+	let roughness = 0.003;
+	let amplitude = 100;
+	if (!simplexNoise) {
+		simplexNoise = openSimplexNoise(seed);
+	}
+	try {
+		let top = parseInt(element.style.top);
+		if (element.style.top === "") {
+			top = 0;
+		}
+		element.style.top = "" + (simplexNoise.noise2D(100000, seed*roughness)*amplitude) + "px";
+
+		let left = parseInt(element.style.left);
+		if (element.style.left === "") {
+			left = 0;
+		}
+		element.style.left = "" + (simplexNoise.noise2D(0, seed*roughness)*amplitude) + "px";
+	} catch {
+		element = $((peerID === null)? "#myCanvas" : `#canvas-${peerID}`)[0];
+	}
+
+	if (dancing[peerID]) {
+		setTimeout(() => {danceFloat(element, simplexNoise, peerID)}, 1000/24);
+	} else {
+		element.style.top = "0px";
+		element.style.left = "0px";
+	}
 }
 
 function headpat(peerID) {
@@ -468,6 +537,14 @@ function playVideoOnCanvas(video, canvas, menu) {
 					let y = (canvas.height - $this.clientHeight)/2;
 					ctx.drawImage($this, x, y);
 				}
+				if (canvas.id === "myCanvas" && dancing[null]) {
+					let hue = (Date.now() * discoRoughness)%360;
+					let col = hsvToHex(hue, 1, 1);
+					ctx.globalAlpha = 0.2;
+					ctx.fillStyle = col;
+					ctx.fillRect(0, 0, canvas.width, canvas.height);
+					ctx.globalAlpha = 1.0;
+				}
 				setTimeout(loop, 1000/webcamFPS);
 			}
 		})();
@@ -713,7 +790,11 @@ function constructPeer(peerID, initiator, stream) {
 	peer.on("stream", (stream) => {gotStream(peerID, stream)});
 	peer.on("signal", (data) => {
 		socket.emit("signal", peerID, data);
-	})
+	});
+
+	if (dancing[null]) {
+		socket.emit("dance");
+	}
 
 	peer.on("close", function () {removePeer(peerID)});
 	peer.on("error", function () {removePeer(peerID)});

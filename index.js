@@ -55,6 +55,14 @@ io.on("connection", (socket) => {
 		io.to(recipient).emit("headpat-me");
 	});
 
+	socket.on("dance", function() {
+		socket.broadcast.to(this.room).emit("dance", this.id);
+	});
+
+	socket.on("stopdance", function() {
+		socket.broadcast.to(this.room).emit("stopdance", this.id);
+	})
+
 });
 
 function disconnect() {

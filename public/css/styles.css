@@ -88,6 +88,7 @@ body {
 }
 
 .streamCanvas {
+	position: relative;
 	height: 100%;
 }
 
