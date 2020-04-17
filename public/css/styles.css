@@ -324,6 +324,10 @@ input[type=range]::-moz-focus-outer {
     display: inline;
 }
 
+.body.error {
+    overflow-y: auto;
+}
+
 audio {
 	display: none;
 }
