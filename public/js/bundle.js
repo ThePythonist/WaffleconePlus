@@ -8176,6 +8176,7 @@ const movieData = {};
 let room;
 let hosting = null;
 let movieStream = null;
+let lastMouseE = null;
 
 const barHeight = 10;
 const barPadding = 10;
@@ -8328,6 +8329,7 @@ if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor))
 						movieData.paused = data.paused;
 						movieData.time = data.time;
 						movieData.duration = data.duration;
+						mouseMove(lastMouseE);
 					});
 
 					socket.on("requestPause", (paused) => {
@@ -8550,6 +8552,34 @@ function mindWebcamPlacement() {
 	}
 }
 
+function mouseMove(e) {
+	lastMouseE = e;
+	let handles = $(".ui-resizable-handle").each(function (index) {
+		let pos = this.getBoundingClientRect();
+		if ($(this).hasClass("ui-resizable-e") || $(this).hasClass("ui-resizable-w")) {
+			if (e.clientX >= pos.left - resizeReach && e.clientX <= pos.right + resizeReach && e.clientY >= pos.top && e.clientY <= pos.bottom) {
+				$(this).addClass("show");
+			} else {
+				$(this).removeClass("show");
+			}
+		} else {
+			if (e.clientY >= pos.top - resizeReach && e.clientY <= pos.bottom + resizeReach && e.clientX >= pos.left && e.clientX <= pos.right) {
+				$(this).addClass("show");
+			} else {
+				$(this).removeClass("show");
+			}
+		}
+	});
+
+	let menu = $("#menuCanvas")[0]
+	let movieBox = menu.getBoundingClientRect();
+	if (movieBox.left <= e.clientX && e.clientX <= movieBox.right && movieBox.top <= e.clientY && e.clientY <= movieBox.bottom) {
+		menuOverlay(e);
+	} else {
+		menu.getContext("2d").clearRect(0, 0, menu.width, menu.height);
+	}
+}
+
 function setupHandles() {
 	bindMoviePane();
 	$("body, html, .wrapper").on("resize", bindMoviePane);
@@ -8566,32 +8596,7 @@ function setupHandles() {
 		maxHeight: $(".wrapper").outerHeight()*movieBounds[1]
 	}).on("resize", bindWebcamPane);
 
-	$("body")[0].addEventListener("mousemove", function(e) {
-		let handles = $(".ui-resizable-handle").each(function (index) {
-			let pos = this.getBoundingClientRect();
-			if ($(this).hasClass("ui-resizable-e") || $(this).hasClass("ui-resizable-w")) {
-				if (e.clientX >= pos.left - resizeReach && e.clientX <= pos.right + resizeReach && e.clientY >= pos.top && e.clientY <= pos.bottom) {
-					$(this).addClass("show");
-				} else {
-					$(this).removeClass("show");
-				}
-			} else {
-				if (e.clientY >= pos.top - resizeReach && e.clientY <= pos.bottom + resizeReach && e.clientX >= pos.left && e.clientX <= pos.right) {
-					$(this).addClass("show");
-				} else {
-					$(this).removeClass("show");
-				}
-			}
-		});
-
-		let menu = $("#menuCanvas")[0]
-		let movieBox = menu.getBoundingClientRect();
-		if (movieBox.left <= e.clientX && e.clientX <= movieBox.right && movieBox.top <= e.clientY && e.clientY <= movieBox.bottom) {
-			menuOverlay(e);
-		} else {
-			menu.getContext("2d").clearRect(0, 0, menu.width, menu.height);
-		}
-	});
+	$("body")[0].addEventListener("mousemove", mouseMove);
 }
 
 function playAudioOnElement(stream, audioElement) {
@@ -8804,6 +8809,7 @@ function sendMovieData() {
 	movieData.time = movie.currentTime;
 	movieData.duration = movie.duration;
 	socket.emit("movieData", movieData);
+	mouseMove(lastMouseE);
 }
 
 function populateMovieCanvas() {
