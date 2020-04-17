@@ -1,0 +1,227 @@
+.header {
+	position: fixed;
+	top: 3px;
+	right: 3px;
+}
+
+.main {
+	display: flex;
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: -50;
+}
+
+.main .inner {
+	margin: auto;
+	text-align: center;
+	display: inline-block;
+}
+
+.main .inner p {
+	margin: 20px;
+}
+
+.title {
+	font-size: 100px;
+	font-weight: bold;
+	background: rgb(2,0,36);
+	background: linear-gradient(12deg, rgba(2,0,36,1) 0%, rgba(26,26,195,1) 10%, rgba(0,212,255,1) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	-webkit-text-stroke: 3px black;
+	-webkit-animation: fadein 0.5s; /* Safari, Chrome and Opera > 12.1 */
+	   -moz-animation: fadein 0.5s; /* Firefox < 16 */
+		-ms-animation: fadein 0.5s; /* Internet Explorer */
+		 -o-animation: fadein 0.5s; /* Opera < 12.1 */
+			animation: fadein 0.5s;
+}
+
+.tagline {
+	font-size: 50px;
+	font-weight: bold;
+	background: rgb(255,255,255);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	-webkit-text-stroke: 1px black;
+	-webkit-animation: fadein-two 2s; /* Safari, Chrome and Opera > 12.1 */
+	   -moz-animation: fadein-two 2s; /* Firefox < 16 */
+		-ms-animation: fadein-two 2s; /* Internet Explorer */
+		 -o-animWafflecone
+
+ation: fadein-two 2s; /* Opera < 12.1 */
+			animation: fadein-two 2s;
+}
+
+.tagline.two {
+	font-size: 30px;
+	-webkit-animation: fadein-three 4s; /* Safari, Chrome and Opera > 12.1 */
+	   -moz-animation: fadein-three 4s; /* Firefox < 16 */
+		-ms-animation: fadein-three 4s; /* Internet Explorer */
+		 -o-animation: fadein-three 4s; /* Opera < 12.1 */
+			animation: fadein-three 4s;
+}
+
+.tagline.three {
+	font-size: 30px;
+	-webkit-animation: fadein-four 6s; /* Safari, Chrome and Opera > 12.1 */
+	   -moz-animation: fadein-four 6s; /* Firefox < 16 */
+		-ms-animation: fadein-four 6s; /* Internet Explorer */
+		 -o-animation: fadein-four 6s; /* Opera < 12.1 */
+			animation: fadein-four 6s;
+}
+
+
+.main .inner img {
+	-webkit-animation: fadein-five 8s; /* Safari, Chrome and Opera > 12.1 */
+	   -moz-animation: fadein-five 8s; /* Firefox < 16 */
+		-ms-animation: fadein-five 8s; /* Internet Explorer */
+		 -o-animation: fadein-five 8s; /* Opera < 12.1 */
+			animation: fadein-five 8s;
+}
+
+@keyframes fadein {
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@keyframes fadein-two {
+	0% { opacity: 0; }
+	50% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@keyframes fadein-three {
+	0% { opacity: 0; }
+	67% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@keyframes fadein-four {
+	0% { opacity: 0; }
+	75% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@keyframes fadein-five {
+	0% { opacity: 0; }
+	80% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-moz-keyframes fadein {
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-moz-keyframes fadein-two {
+	0% { opacity: 0; }
+	50% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-moz-keyframes fadein-three {
+	0% { opacity: 0; }
+	67% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-moz-keyframes fadein-four {
+	0% { opacity: 0; }
+	75% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-moz-keyframes fadein-five {
+	0% { opacity: 0; }
+	80% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadein {
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadein-two {
+	0% { opacity: 0; }
+	50% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadein-three {
+	0% { opacity: 0; }
+	67% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadein-four {
+	0% { opacity: 0; }
+	75% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadein-five {
+	0% { opacity: 0; }
+	80% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-ms-keyframes fadein {
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-ms-keyframes fadein-two {
+	0% { opacity: 0; }
+	50% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-ms-keyframes fadein-three {
+	0% { opacity: 0; }
+	67% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-ms-keyframes fadein-four {
+	0% { opacity: 0; }
+	75% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-ms-keyframes fadein-five {
+	0% { opacity: 0; }
+	80% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-o-keyframes fadein {
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-o-keyframes fadein-two {
+	0% { opacity: 0; }
+	50% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-o-keyframes fadein-three {
+	0% { opacity: 0; }
+	67% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-o-keyframes fadein-four {
+	0% { opacity: 0; }
+	75% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-o-keyframes fadein-five {
+	0% { opacity: 0; }
+	80% { opacity: 0; }
+	100% { opacity: 1; }
+}
