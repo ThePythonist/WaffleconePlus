@@ -90,6 +90,7 @@ body {
 .streamCanvas {
 	position: relative;
 	height: 100%;
+	transform: scaleX(-1);
 }
 
 .shrink.overflow {
@@ -126,8 +127,6 @@ label {
 	top: 50%;
 	transform: translateX(-50%) translateY(-50%);
 }
-
-
 
 #menuCanvas {
 	z-index: 1;
