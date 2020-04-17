@@ -193,3 +193,7 @@
 	80% { opacity: 0; }
 	100% { opacity: 1; }
 }
+
+.header {
+	width: 100%;
+}
