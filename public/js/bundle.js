@@ -8187,7 +8187,7 @@ let fullscreen = false;
 const emoji = ["grin", "laugh", "face with hearts", "heart", "tongue", "kiss", "hug", "wink", "heart eyes", "crazy", "cry", "thumbs up", "gay", "transflag", "frog"];
 
 if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && location.protocol !== "https:") {
-    location.replace(`https:${location.href.substring(location.protocol.length)}`);
+	location.replace(`https:${location.href.substring(location.protocol.length)}`);
 }
 
 var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
