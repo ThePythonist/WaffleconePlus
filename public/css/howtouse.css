@@ -19,8 +19,9 @@ html, body {
 	padding: 20px;
 	border: 1px solid black;
 	border-radius: 10px;
-	margin: 20px 100px 20px 100px;
+	margin: 20px 10% 20px 10%;
 }
+
 
 a {
 	color: #00177d;
