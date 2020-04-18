@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Wafflecone</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="./css/styles.css">
+		<link rel="stylesheet" href="./css/howtouse.css">
+		<link rel="icon" href="/img/yinyang.png">
+	</head>
+	<body>
+		<div class="header leftheader">
+			<button type="button" class="webcamControlButton" onclick="location.href = '/';">
+				<img src="/img/wafflecone.png" />
+			</button>
+		</div>
+		<div class="title">Wafflecone</div>
+		<div class="main">
+			<div class="section">
+				<h1>Watch movies with friends over the internet</h1>
+				<p>I initially made Wafflecone when my girlfriend Brianna had to leave the country during the Coronavirus pandemic of 2020. We experimented with various ways of trying to have movie nights online, but none of them totally fit our requirements. The main problem we had was that we couldn't stream both the movie we were watching and our webcam feeds at the same time. Many websites offered a text chat, but we could find none which offered adequate video and audio chat.</p>
+				<p>After several weeks of streaming just the movies while video calling each other on our phones and resting the phones against our laptop screens, I decided to make a solution of our own.</p>
+			</div>
+			<div class="section">
+				<h1>No user accounts. No data storage. Total security.</h1>
+				<p>Wafflecone does not have user accounts. It does not store any of your personal data, and it does not share your cookies with any third party. Please see our <a href="/legal/privacypolicy.html">Privacy Policy</a> for more details.</p>
+				<p>Not just that, Wafflecone merely acts as a signalling server enabling communication between users. This means that nobody &ndash; not even the Wafflecone servers &ndash; can see the movies you stream or access your webcam data without joining your room. For more information on the communication protocol, read <a href="https://webrtc-security.github.io/">A Study of WebRTC Security</a>.</p>
+			</div>
+			<div class="section">
+				<h1>How to use</h1>
+				<p>The first step is to join or create a room. You can join a room by either opening an invitation link sent to you by a friend, or by entering the room ID into our <a href="/">homepage</a> and clicking "<b>Join</b>". You can create a room by clicking the "<b>Create New Room</b>" button on the <a href="/">homepage</a>. This is the recommended way to create a new room because it allocates you a pseudo-random room ID, which is virtually impossible for anybody to guess. You can however also simply enter whatever room ID you would like to have into the field on the <a href="/">homepage</a> and click "<b>Join</b>" if you are sufficiently certain that nobody whom you do not want to join your room will be able to guess the ID or stumble upon it by accident. It is important to note that due to the lack of user accounts, you cannot block somebody from entering your room, so once they're in, they're in. To get rid of them, you would have to vacate and generate a new room.</p>
+				<p>Once you are in a room, you can click the <i>share</i> button on the right hand panel to view your room's ID, and share it with others.</p>
+				<p>Unfortunately we can't provide movies for you to watch. You have to download them yourself from anywhere you like (subject to our <a href="/legal/termsandconditions.html">Terms and Conditions</a>) as either a <b>.mp4</b>, <b>.ogg</b>, or <b>.webm</b> file, which you then select when you're in your room by clicking the "<b>Choose a movie</b>" button. Please note that it is against our <a href="/legal/termsandconditions.html">Terms and Conditions</a> to use our services to stream copyrighted, pirated or otherwise illegal videos.</p>
+				<p>There is a <i>fullscreen</i> button on the right-hand panel and when a movie is playing there will appear a volume slider also on the right-hand panel.</p>
+				<p>You can mute your microphone or pause your video by hovering over your own webcam image with your mouse and clicking the appropriate button</p>
+			</div>
+			<div class="section">
+				<h1>Messaging</h1>
+				Besides simply using your webcam to talk to one another, there are several other ways to communicate using Wafflecone
+				<ul>
+					<li>
+						The "<b>message</b>" box on the left-hand panel. Typing into this and submitting with the enter key will broadcast a message to everybody in the room.
+					</li>
+					<br />
+					<li>
+						The emoticon buttons also on the left-hand panel. When clicked, the image will float along the screen of everybody in the room.
+					</li>
+					<br />
+					<li>
+						Party mode. Hovering over your webcam image with your mouse and clicking the disco ball icon will enable party mode. This will cause your webcam feed to become tinted with vibrant colours and to jiggle around. I wanted to add this feature for some reason, and I don't rightly recall why. It might have been for when there's a really good song playing in the movie or something?
+					</li>
+					<br />
+					<li>
+						My favourite: the headpat button. Hover over someone's face and click the hand to send them virtual headpats. This one is pretty self-explanatory.
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="footer">
+			<p class="terms">
+				By using Wafflecone you agree to the <a target="_blank" href="/legal/termsandconditions.html">Terms and Conditions</a>.
+				<br />
+				Please be aware of our <a target="_blank" href="/legal/privacypolicy.html">Privacy Policy</a>.
+			</p>
+		</div>
+	</body>
+</html>

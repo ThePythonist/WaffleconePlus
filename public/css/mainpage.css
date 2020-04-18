@@ -194,12 +194,7 @@
 	100% { opacity: 1; }
 }
 
-.header {
-	width: 100%;
-}
-
-
-@media (max-width:629px) {
+@media (max-width:1064px) {
 	.header {
 		display: none;
 	}

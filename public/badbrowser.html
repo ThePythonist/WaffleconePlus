@@ -7,15 +7,29 @@
 		<link rel="stylesheet" href="./css/styles.css">
 		<link rel="icon" href="/img/yinyang.png">
 	</head>
-	<body class="error">
+	<body>
 		<script>
 			if (/Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)) {
 				location.href = "/index.html";
 			}
 		</script>
-		<p class="error">Wafflecone is not supported on this browser. You should be ashamed.</p>
-		<p class="error">Or maybe try Chrome or something. Chrome is great.</p>
-		<a class="error" target="_blank" href="https://www.google.com/chrome/"><img width="100" src="https://www.google.com/chrome/static/images/chrome-logo.svg" /></a>
-		<p class="error">Oh oh and make sure you're on a desktop computer or laptop. Phones are bad.</p>
+		<div class="header leftheader">
+			<button type="button" class="webcamControlButton" onclick="location.href = '/';">
+				<img src="/img/wafflecone.png" />
+			</button>
+		</div>
+		<div class="error">
+			<p class="error">Wafflecone is not supported on this browser. You should be ashamed.</p>
+			<p class="error">Or maybe try Chrome or something. Chrome is great.</p>
+			<a class="error" target="_blank" href="https://www.google.com/chrome/"><img width="100" src="https://www.google.com/chrome/static/images/chrome-logo.svg" /></a>
+			<p class="error">Oh oh and make sure you're on a desktop computer or laptop. Phones are bad.</p>
+		</div>
+		<div class="footer">
+			<p class="terms">
+				By using Wafflecone you agree to the <a target="_blank" href="/legal/termsandconditions.html">Terms and Conditions</a>.
+				<br />
+				Please be aware of our <a target="_blank" href="/legal/privacypolicy.html">Privacy Policy</a>.
+			</p>
+		</div>
 	</body>
 </html>

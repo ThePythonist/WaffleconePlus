@@ -1,0 +1,31 @@
+html, body {
+	overflow: auto;
+}
+
+.title {
+	font-size: 4vw;
+	font-weight: bold;
+	background: rgb(2,0,36);
+	background: linear-gradient(12deg, rgba(2,0,36,1) 0%, rgba(26,26,195,1) 10%, rgba(0,212,255,1) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	-webkit-text-stroke: 0.05vw black;
+	text-align: center;
+	margin: 30px;
+}
+
+.section {
+	background-color: #fffff5;
+	padding: 20px;
+	border: 1px solid black;
+	border-radius: 10px;
+	margin: 20px 100px 20px 100px;
+}
+
+a {
+	color: #00177d;
+}
+
+.main .section:last-child {
+	margin-bottom: 200px;
+}
