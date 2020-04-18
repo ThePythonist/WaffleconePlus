@@ -21,16 +21,20 @@ io.on("connection", (socket) => {
 	socket.on("disconnect", disconnect);
 
 	socket.on("newConnection", function (room) {
-		console.log(`client ${this.id} joined room ${room}`);
-		this.join(room);
-		this.room = room;
-		let peerIDs = [];
-		for (let s in io.sockets.adapter.rooms[room].sockets) {
-			if (s !== this.id) {
-				peerIDs.push(s);
+		if (io.sockets.adapter.rooms[room] === undefined || io.sockets.adapter.rooms[room].length < 5) {
+			console.log(`client ${this.id} joined room ${room}`);
+			this.join(room);
+			this.room = room;
+			let peerIDs = [];
+			for (let s in io.sockets.adapter.rooms[room].sockets) {
+				if (s !== this.id) {
+					peerIDs.push(s);
+				}
 			}
+			this.emit("peerIDs", peerIDs);
+		} else {
+			this.emit("full");
 		}
-		this.emit("peerIDs", peerIDs);
 	});
 
 	socket.on("signal", function (socketID, data) {

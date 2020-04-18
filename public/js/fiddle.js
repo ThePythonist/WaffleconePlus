@@ -42,6 +42,11 @@ if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor))
 	socket.on("connect", () => {
 		let vars = getParams(window.location.href);
 		room = vars["id"];
+
+		socket.on("full", () => {
+			$(".wrapper").html("<p class='error'>This room is full. Get fewer friends please. Thanks.</p>");
+		});
+
 		if (room === null || room === undefined || !/^[A-za-z0-9-_]+$/.test(room)) {
 			$(".wrapper").html("<p class='error'>Invalid room. Please apologise.</p>");
 		} else {
