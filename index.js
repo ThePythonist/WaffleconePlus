@@ -1,13 +1,19 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 100
+});
 const port = process.env.PORT || 3000;
 
 const roomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 const roomIDLength = 50;
 const tries = 1000;
 
+app.use(limiter);
 app.use(express.static(__dirname + "/public"));
 
 io.on("connection", (socket) => {
