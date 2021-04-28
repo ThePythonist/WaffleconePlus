@@ -8202,7 +8202,7 @@ $("body, html").on("click", function(e) {
 });
 
 if (!/Chrome/.test(navigator.userAgent) || !/Google Inc/.test(navigator.vendor)) {
-	location.href = "/badbrowser.html";
+	// location.href = "/badbrowser.html";
 } else {
 	socket.on("connect", () => {
 		let vars = getParams(window.location.href);
